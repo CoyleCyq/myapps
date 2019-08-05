@@ -106,6 +106,181 @@ export default {
 					]
 				}
 			],
+			// 幻阁数据
+			huangeList: [
+				{ 
+					level: '闪耀卡',
+					dataList: [
+						{ name: '莉莉丝·欲望之音', suitName: '欲望之音', level: '闪耀卡', mainType: '性感', author: '莉莉丝', labels: [] },
+						{ name: '洛昂·璀璨之恋', suitName: '璀璨之恋', level: '闪耀卡', mainType: '典雅', author: '洛昂', labels: [] }
+					]	
+				},
+				{
+					level: '闪耀',
+					dataList: [
+						{ name: '痴缠', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '迷醉约束', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '炫目星辰', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '女王仪仗', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '欲望系带', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '星辰之路', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '欲望之音', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '爱之掠夺', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '莉莉丝印记', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '甜蜜魅惑', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '幻海流星', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '群星环绕', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '迷梦疏影', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '启明星·破晓', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '奇迹之心', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '繁花之径', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '露凝晨雾', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '绒羽欢歌', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '曙光初醒', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '纯白礼赞', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '粼粼璀璨', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '羽歌', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '永恒湖光', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '转瞬月虹', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '掠影', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '芙蓉枝', suitName: '', level: '闪耀', mainType: '甜美', author: '一衣红雪', labels: ['云端', '幻想'] },
+						{ name: '旋转木马·梦', suitName: '', level: '闪耀', mainType: '清新', author: '叶苏夏', labels: ['浪漫', '幻想'] },
+						{ name: '樱花小兔', suitName: '', level: '闪耀', mainType: '甜美', author: '叶苏夏', labels: ['妮妮尔', '浪漫'] },
+						{ name: '魅', suitName: '', level: '闪耀', mainType: '性感', author: '左一', labels: ['礼服', '浪漫'] },
+						{ name: '猫猫的梦游', suitName: '', level: '闪耀', mainType: '甜美', author: '茶薄荷', labels: ['妮妮尔', '幻想'] }
+					]
+				},
+				{
+					level: '非凡卡',
+					dataList: [
+						{ name: '洛洛梨·暗夜优雅', suitName: '暗夜优雅', level: '非凡卡', mainType: '典雅', author: '洛洛梨', labels: [] },
+						{ name: '一衣红雪·花影遥', suitName: '花影遥', level: '非凡卡', mainType: '清新', author: '一衣红雪', labels: [] },
+						{ name: '左一·佣兵女王', suitName: '佣兵女王', level: '非凡卡', mainType: '帅气', author: '左一', labels: [] },
+						{ name: '夏冬·魔法的祝福', suitName: '魔法的祝福', level: '非凡卡', mainType: '甜美', author: '夏冬', labels: [] },
+						{ name: '李尔里德·抖落繁星', suitName: '抖落繁星', level: '非凡卡', mainType: '甜美', author: '李尔里德', labels: [] },
+						{ name: '魔羊·苍羽流光', suitName: '苍羽流光', level: '非凡卡', mainType: '性感', author: '魔羊', labels: [] }
+					]
+				},
+				{
+					level: '稀有卡',
+					dataList: [
+						{ name: '佐森·朋克之夜', suitName: '朋克之夜', level: '稀有卡', mainType: '帅气', author: '佐森', labels: [] },
+						{ name: '海哲·钻石星烁夜', suitName: '钻石星烁夜', level: '稀有卡', mainType: '性感', author: '海哲', labels: [] },
+						{ name: '洛洛梨·小雏菊日记', suitName: '小雏菊日记', level: '稀有卡', mainType: '甜美', author: '洛洛梨', labels: [] },
+						{ name: '收视搭档·荒原印象', suitName: '荒原印象', level: '稀有卡', mainType: '清新', author: '收视搭档', labels: [] },
+						{ name: '爱衣·最初的告白', suitName: '最初的告白', level: '稀有卡', mainType: '典雅', author: '爱衣', labels: [] }
+					]
+				},
+				{
+					level: '非凡',
+					dataList: [
+						{ name: '拼布菱格', suitName: '', level: '非凡', mainType: '典雅', author: '肖扬', labels: ['校园', '知性'] }
+					]
+				},
+				{
+					level: '稀有',
+					dataList: [
+						{ name: '花瑶', suitName: '', level: '稀有', mainType: '性感', author: '一衣红雪', labels: ['云端', '简约'] }
+					]
+				}
+			],
+			// 流光数据
+			liuguangList: [
+				{
+					level: '限定稀有',
+					dataList: [
+						{ name: '痴缠', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+					]
+				},
+				{
+					level: '限定非凡',
+					dataList: [
+						{ name: '痴缠', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+					]
+				},
+				{
+					level: '限定稀有卡',
+					dataList: [
+						{ name: '痴缠', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+					]
+				},
+				{
+					level: '限定非凡卡',
+					dataList: [
+						{ name: '痴缠', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+					]
+				},
+				{
+					level: '非凡卡',
+					dataList: [
+						{ name: '洛洛梨·暗夜优雅', suitName: '暗夜优雅', level: '非凡卡', mainType: '典雅', author: '洛洛梨', labels: [] },
+						{ name: '一衣红雪·花影遥', suitName: '花影遥', level: '非凡卡', mainType: '清新', author: '一衣红雪', labels: [] },
+						{ name: '左一·佣兵女王', suitName: '佣兵女王', level: '非凡卡', mainType: '帅气', author: '左一', labels: [] },
+						{ name: '夏冬·魔法的祝福', suitName: '魔法的祝福', level: '非凡卡', mainType: '甜美', author: '夏冬', labels: [] },
+						{ name: '李尔里德·抖落繁星', suitName: '抖落繁星', level: '非凡卡', mainType: '甜美', author: '李尔里德', labels: [] },
+						{ name: '魔羊·苍羽流光', suitName: '苍羽流光', level: '非凡卡', mainType: '性感', author: '魔羊', labels: [] }
+					]
+				},
+				{
+					level: '稀有卡',
+					dataList: [
+						{ name: '佐森·朋克之夜', suitName: '朋克之夜', level: '稀有卡', mainType: '帅气', author: '佐森', labels: [] },
+						{ name: '海哲·钻石星烁夜', suitName: '钻石星烁夜', level: '稀有卡', mainType: '性感', author: '海哲', labels: [] },
+						{ name: '洛洛梨·小雏菊日记', suitName: '小雏菊日记', level: '稀有卡', mainType: '甜美', author: '洛洛梨', labels: [] },
+						{ name: '收视搭档·荒原印象', suitName: '荒原印象', level: '稀有卡', mainType: '清新', author: '收视搭档', labels: [] },
+						{ name: '爱衣·最初的告白', suitName: '最初的告白', level: '稀有卡', mainType: '典雅', author: '爱衣', labels: [] }
+					]
+				},
+				{ 
+					level: '闪耀卡',
+					dataList: [
+						{ name: '莉莉丝·欲望之音', suitName: '欲望之音', level: '闪耀卡', mainType: '性感', author: '莉莉丝', labels: [] },
+						{ name: '洛昂·璀璨之恋', suitName: '璀璨之恋', level: '闪耀卡', mainType: '典雅', author: '洛昂', labels: [] }
+					]	
+				},
+				{
+					level: '闪耀',
+					dataList: [
+						{ name: '痴缠', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '迷醉约束', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '炫目星辰', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '女王仪仗', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '欲望系带', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '星辰之路', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '欲望之音', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '爱之掠夺', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '莉莉丝印记', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '甜蜜魅惑', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '幻海流星', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '群星环绕', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '迷梦疏影', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+						{ name: '启明星·破晓', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '奇迹之心', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '繁花之径', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '露凝晨雾', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '绒羽欢歌', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '曙光初醒', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '纯白礼赞', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '粼粼璀璨', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '羽歌', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '永恒湖光', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '转瞬月虹', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+						{ name: '掠影', suitName: '璀璨之恋', level: '闪耀', mainType: '典雅', author: '洛昂', labels: ['礼服', '清凉'] },
+					]
+				},
+				{
+					level: '非凡',
+					dataList: [
+						{ name: '痴缠', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+					]
+				},
+				{
+					level: '稀有',
+					dataList: [
+						{ name: '痴缠', suitName: '欲望之音', level: '闪耀', mainType: '性感', author: '莉莉丝', labels: ['礼服', '妮妮尔'] },
+					]
+				}
+			],
 			config: {
 				mige: { // 迷阁
 					pt: 94.40, // 普通概率
