@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title"><b>闪耀暖暖竞技场兑换计算</b></div>
+    <div class="title"><b>闪耀暖暖国服竞技场兑换计算器</b></div>
     <hr class="mhr">
     <div class="showTime">{{ getTitle }}</div>
     <!-- <p><button onclick="saveSettings()">保存设置</button><button onclick="loadSettings()">读取设置</button></p> -->
@@ -9,7 +9,7 @@
       <el-table ref="table" :data="config.clothesInfo" size="mini" stripe @row-click="rowClick">
         <el-table-column
           label="部位"
-          width="80px"
+          width="100px"
           prop="type"
         />
         <el-table-column
@@ -140,7 +140,7 @@ export default {
     return {
       // 配置信息
       config: {
-        timeEnd: Date.parse('2019-08-11 05:00:00'), // 结束时间
+        timeEnd: Date.parse('2019-12-08 05:00:00'), // 结束时间
         timeNow: new Date().getTime(), // 现在时间
         clothesInfo: [ // 服装信息
           { type: '特殊-翅膀', name: '记忆残翼', require: '永恒的传奇', need: 1188, checked: false },
