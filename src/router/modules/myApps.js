@@ -23,6 +23,18 @@ const myAppsRouter = {
       component: () => import('@/views/myApps/nuannuan.vue'),
       name: 'nuannuan',
       meta: { title: 'nuannuan' }
+    },
+    {
+      path: 'clothes',
+      component: () => import('@/views/myApps/clothes.vue'),
+      name: 'clothes',
+      meta: { title: 'clothes' }
+    },
+    {
+      path: 'evalLevelUpCost',
+      component: () => import('@/views/myApps/evalLevelUpCost.vue'),
+      name: 'evalLevelUpCost',
+      meta: { title: 'evalLevelUpCost' }
     }
   ]
 }
