@@ -25,14 +25,9 @@
       highlight-current-row
       style="width: 100%;"
     >
-      <el-table-column label="名称" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.name }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="套装名称" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.suitName }}</span>
+          <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column v-if="showLevel" label="品质" width="110px" align="center">
@@ -40,34 +35,24 @@
           <span>{{ scope.row.level }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="设计师" width="110px" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.author }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="来源" width="110px" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.source }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="部件数" width="110px" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.amount }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="主属性" width="80px">
         <template slot-scope="scope">
           <span>{{ scope.row.mainAttr }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="典雅" width="80px">
-        <template slot-scope="scope">
-          <span>{{ scope.row.elegantValue }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="性感" width="80px">
-        <template slot-scope="scope">
-          <span>{{ scope.row.sexyValue }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="甜美" width="80px">
-        <template slot-scope="scope">
-          <span>{{ scope.row.sweetValue }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="清新" width="80px">
-        <template slot-scope="scope">
-          <span>{{ scope.row.freshValue }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="帅气" width="80px">
-        <template slot-scope="scope">
-          <span>{{ scope.row.handsomeValue }}</span>
         </template>
       </el-table-column>
       <el-table-column label="标签" align="center" width="95">
@@ -88,7 +73,7 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" size="mini" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="服装名称" prop="name">
+        <el-form-item label="套装名称" prop="name">
           <el-input v-model="temp.name" />
         </el-form-item>
         <el-form-item label="品阶" prop="level">
@@ -96,33 +81,16 @@
             <el-option v-for="level in levelOptions" :key="level" :label="level" :value="level" />
           </el-select>
         </el-form-item>
-        <el-form-item label="所属套装" prop="suitName">
-          <el-select v-model="temp.suitName" class="filter-item" placeholder="请选择套装">
-            <el-option v-for="suit in suitOptions" :key="suit" :label="suit" :value="suit" />
-          </el-select>
-        </el-form-item>
         <el-form-item label="主属性" prop="mainAttr">
           <el-select v-model="temp.mainAttr" class="filter-item" placeholder="请选择属性">
             <el-option v-for="attr in attrOptions" :key="attr" :label="attr" :value="attr" />
           </el-select>
         </el-form-item>
-        <el-form-item label="典雅">
-          <el-input v-model="temp.elegantValue" />
+        <el-form-item label="设计师">
+          <el-input v-model="temp.author" />
         </el-form-item>
-        <el-form-item label="甜美">
-          <el-input v-model="temp.sweetValue" />
-        </el-form-item>
-        <el-form-item label="清新">
-          <el-input v-model="temp.freshValue" />
-        </el-form-item>
-        <el-form-item label="性感">
-          <el-input v-model="temp.sexyValue" />
-        </el-form-item>
-        <el-form-item label="帅气">
-          <el-input v-model="temp.handsomeValue" />
-        </el-form-item>
-        <el-form-item label="图片路径">
-          <el-input v-model="temp.imgurl" />
+        <el-form-item label="部件数">
+          <el-input v-model="temp.amount" />
         </el-form-item>
         <el-form-item label="来源">
           <el-input v-model="temp.source" />
@@ -144,13 +112,13 @@
 </template>
 
 <script>
-import { fetchList, createClothes, updateClothes } from '@/api/clothes'
+import { fetchList, createSuit, updateSuit } from '@/api/suit'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 export default {
-  name: 'Clothes',
+  name: 'Suit',
   components: { Pagination },
   directives: { waves },
   data() {
@@ -186,20 +154,11 @@ export default {
         id: undefined,
         name: '',
         level: '',
-        suitId: undefined,
-        suitName: '',
-        imgurl: '',
         mainAttr: '',
-        soure: '',
-        elegantValue: '',
-        sweetValue: '',
-        freshValue: '',
-        sexyValue: '',
-        handsomeValue: '',
-        price: '',
-        priceType: '',
-        label: '',
-        labelValue: ''
+        source: '',
+        author: '',
+        amount: '',
+        label: ''
       }
     }
   },
@@ -228,20 +187,11 @@ export default {
         id: undefined,
         name: '',
         level: '',
-        suitId: undefined,
-        suitName: '',
-        imgurl: '',
         mainAttr: '',
-        soure: '',
-        elegantValue: '',
-        sweetValue: '',
-        freshValue: '',
-        sexyValue: '',
-        handsomeValue: '',
-        price: '',
-        priceType: '',
-        label: '',
-        labelValue: ''
+        source: '',
+        author: '',
+        amount: '',
+        label: ''
       }
     },
     handleCreate() {
@@ -257,7 +207,7 @@ export default {
         if (valid) {
           this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
           this.temp.author = 'vue-element-admin'
-          createClothes(this.temp).then(() => {
+          createSuit(this.temp).then(() => {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.$notify({
@@ -283,7 +233,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          updateClothes(tempData).then(() => {
+          updateSuit(tempData).then(() => {
             for (const v of this.list) {
               if (v.id === this.temp.id) {
                 const index = this.list.indexOf(v)

@@ -3,6 +3,7 @@ import { param2Obj } from '../src/utils'
 
 import user from './user'
 import clothes from './clothes'
+import suit from './suit'
 import role from './role'
 import article from './article'
 import search from './remote-search'
@@ -12,7 +13,8 @@ const mocks = [
   ...role,
   ...article,
   ...search,
-  ...clothes
+  ...clothes,
+  ...suit
 ]
 
 // for front mock
