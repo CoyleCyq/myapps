@@ -86,49 +86,79 @@
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" size="mini" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="服装名称" prop="name">
-          <el-input v-model="temp.name" />
-        </el-form-item>
-        <el-form-item label="品阶" prop="level">
-          <el-select v-model="temp.level" class="filter-item" placeholder="请选择品阶">
-            <el-option v-for="level in levelOptions" :key="level" :label="level" :value="level" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="所属套装" prop="suitName">
-          <el-select v-model="temp.suitName" class="filter-item" placeholder="请选择套装">
-            <el-option v-for="suit in suitOptions" :key="suit" :label="suit" :value="suit" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="主属性" prop="mainAttr">
-          <el-select v-model="temp.mainAttr" class="filter-item" placeholder="请选择属性">
-            <el-option v-for="attr in attrOptions" :key="attr" :label="attr" :value="attr" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="典雅">
-          <el-input v-model="temp.elegantValue" />
-        </el-form-item>
-        <el-form-item label="甜美">
-          <el-input v-model="temp.sweetValue" />
-        </el-form-item>
-        <el-form-item label="清新">
-          <el-input v-model="temp.freshValue" />
-        </el-form-item>
-        <el-form-item label="性感">
-          <el-input v-model="temp.sexyValue" />
-        </el-form-item>
-        <el-form-item label="帅气">
-          <el-input v-model="temp.handsomeValue" />
-        </el-form-item>
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="1000px">
+      <el-form ref="dataForm" :inline="true" :rules="rules" :model="temp" label-position="left" size="mini" label-width="70px" style="width: 950px; margin-left:50px;">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="服装名称" prop="name">
+              <el-input v-model="temp.name" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="品阶" prop="level">
+              <el-select v-model="temp.level" class="filter-item" placeholder="请选择品阶">
+                <el-option v-for="level in levelOptions" :key="level" :label="level" :value="level" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="所属套装" prop="suitName">
+              <el-select v-model="temp.suitName" class="filter-item" placeholder="请选择套装">
+                <el-option v-for="suit in suitOptions" :key="suit" :label="suit" :value="suit" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="主属性" prop="mainAttr">
+              <el-select v-model="temp.mainAttr" class="filter-item" placeholder="请选择属性">
+                <el-option v-for="attr in attrOptions" :key="attr" :label="attr" :value="attr" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="4">
+            <el-form-item label="典雅">
+              <el-input v-model="temp.elegantValue" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="4">
+            <el-form-item label="甜美">
+              <el-input v-model="temp.sweetValue" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="4">
+            <el-form-item label="清新">
+              <el-input v-model="temp.freshValue" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="4">
+            <el-form-item label="性感">
+              <el-input v-model="temp.sexyValue" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="4">
+            <el-form-item label="帅气">
+              <el-input v-model="temp.handsomeValue" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="来源">
+              <el-input v-model="temp.source" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="标签">
+              <el-input v-model="temp.label" />
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-form-item label="图片路径">
           <el-input v-model="temp.imgurl" />
-        </el-form-item>
-        <el-form-item label="来源">
-          <el-input v-model="temp.source" />
-        </el-form-item>
-        <el-form-item label="标签">
-          <el-input v-model="temp.label" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -164,8 +194,7 @@ export default {
         limit: 20,
         level: undefined,
         name: undefined,
-        mainAttr: undefined,
-        sort: '+id'
+        mainAttr: undefined
       },
       dialogStatus: '',
       textMap: {
@@ -199,7 +228,8 @@ export default {
         price: '',
         priceType: '',
         label: '',
-        labelValue: ''
+        labelValue: '',
+        description: ''
       }
     }
   },
@@ -241,7 +271,8 @@ export default {
         price: '',
         priceType: '',
         label: '',
-        labelValue: ''
+        labelValue: '',
+        description: ''
       }
     },
     handleCreate() {

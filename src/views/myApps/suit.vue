@@ -11,9 +11,6 @@
       <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         Export
       </el-button>
-      <el-checkbox v-model="showLevel" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
-        Level
-      </el-checkbox>
     </div>
 
     <el-table
@@ -30,7 +27,7 @@
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="showLevel" label="品质" width="110px" align="center">
+      <el-table-column label="品质" width="110px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.level }}</span>
         </template>
@@ -40,17 +37,17 @@
           <span>{{ scope.row.author }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="来源" width="110px" align="center">
+      <el-table-column label="来源" width="200px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.source }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="部件数" width="110px" align="center">
+      <el-table-column label="部件数" width="80px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.amount }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="主属性" width="80px">
+      <el-table-column label="主属性" width="70px">
         <template slot-scope="scope">
           <span>{{ scope.row.mainAttr }}</span>
         </template>
@@ -69,7 +66,7 @@
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+    <pagination v-show="total>0" :total="total" :page.sync="listQuery.pageIndex" :limit.sync="listQuery.pageSize" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" size="mini" label-width="70px" style="width: 400px; margin-left:50px;">
@@ -128,12 +125,11 @@ export default {
       total: 0,
       listLoading: true,
       listQuery: {
-        page: 1,
-        limit: 20,
+        pageIndex: 1,
+        pageSize: 20,
         level: undefined,
         name: undefined,
-        mainAttr: undefined,
-        sort: '+id'
+        mainAttr: undefined
       },
       dialogStatus: '',
       textMap: {
@@ -141,7 +137,6 @@ export default {
         create: 'Create'
       },
       dialogFormVisible: false,
-      showLevel: false,
       downloadLoading: false,
       rules: {
         level: [{ required: true, message: '品阶是必选的', trigger: 'change' }],
@@ -169,8 +164,9 @@ export default {
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
+        console.log('res', response)
+        this.list = response.data.dataList
+        this.total = response.data.dataMeta.totalCount
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
@@ -178,7 +174,7 @@ export default {
       })
     },
     handleFilter() {
-      this.listQuery.page = 1
+      this.listQuery.pageIndex = 1
       this.getList()
     },
     // 重置新建弹框
@@ -205,8 +201,6 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
           createSuit(this.temp).then(() => {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false

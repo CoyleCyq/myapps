@@ -51,7 +51,7 @@ export default [
       const pageList = mockList.filter((item, index) => index < limit * page && index >= limit * (page - 1))
 
       return {
-        code: 20000,
+        code: 0,
         data: {
           total: mockList.length,
           items: pageList
@@ -68,7 +68,7 @@ export default [
       for (const clothes of List) {
         if (clothes.id === +id) {
           return {
-            code: 20000,
+            code: 0,
             data: clothes
           }
         }
@@ -81,7 +81,7 @@ export default [
     type: 'post',
     response: _ => {
       return {
-        code: 20000,
+        code: 0,
         data: 'success'
       }
     }
@@ -92,7 +92,7 @@ export default [
     type: 'post',
     response: _ => {
       return {
-        code: 20000,
+        code: 0,
         data: 'success'
       }
     }
