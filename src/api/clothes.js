@@ -1,24 +1,24 @@
 import request from '@/utils/request'
+const testAjaxUrl = 'http://localhost:7001/api'
 
-export function fetchList(query) {
+export function fetchClothes(query) {
   return request({
-    url: '/clothes/list',
+    url: testAjaxUrl + '/clothes/getClothes',
     method: 'get',
     params: query
   })
 }
 
-export function fetchClothes(id) {
+export function fetchAllClothes() {
   return request({
-    url: '/clothes/detail',
-    method: 'get',
-    params: { id }
+    url: testAjaxUrl + '/clothes/getAllClothes',
+    method: 'get'
   })
 }
 
-export function createClothes(data) {
+export function addClothes(data) {
   return request({
-    url: '/clothes/create',
+    url: testAjaxUrl + '/clothes/addClothes',
     method: 'post',
     data
   })
@@ -26,7 +26,7 @@ export function createClothes(data) {
 
 export function updateClothes(data) {
   return request({
-    url: '/clothes/update',
+    url: testAjaxUrl + '/clothes/updateClothes',
     method: 'post',
     data
   })

@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 const testAjaxUrl = 'http://localhost:7001/api'
 
-export function fetchList(query) {
+export function fetchSuit(query) {
   return request({
     url: testAjaxUrl + '/suit/getSuit',
     method: 'get',
@@ -9,15 +9,14 @@ export function fetchList(query) {
   })
 }
 
-export function fetchSuit(id) {
+export async function fetchAllSuit() {
   return request({
-    url: '/suit/detail',
-    method: 'get',
-    params: { id }
+    url: testAjaxUrl + '/suit/getAllSuit',
+    method: 'get'
   })
 }
 
-export function createSuit(data) {
+export function addSuit(data) {
   return request({
     url: testAjaxUrl + '/suit/addSuit',
     method: 'post',

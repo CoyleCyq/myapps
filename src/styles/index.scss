@@ -189,3 +189,25 @@ aside {
 .multiselect--active {
   z-index: 1000 !important;
 }
+
+table {
+  label {
+    font-weight: normal;
+    background: $primary;
+    color: #fff;
+    padding: 5px;
+    margin: 0 2px;
+    &.attr-label {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      line-height: 2;
+      border-radius: 50%;
+    }
+    &.text-label{
+      background: none;
+      color: $text;
+    }
+  }
+
+}

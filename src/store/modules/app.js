@@ -6,7 +6,10 @@ const state = {
     withoutAnimation: false
   },
   device: 'desktop',
-  size: Cookies.get('size') || 'medium'
+  size: Cookies.get('size') || 'medium',
+  levelOptions: ['普通', '稀有', '非凡', '闪耀'],
+  attrOptions: ['典雅', '清新', '甜美', '性感', '帅气'],
+  typeOptions: ['发型', '连衣裙', '外套', '上衣', '下装', '袜子', '鞋子', '头饰', '耳饰', '颈饰', '手饰', '手套', '手持物', '特殊', '底妆', '睫毛', '眉毛', '瞳孔', '纯色']
 }
 
 const mutations = {

@@ -1,24 +1,41 @@
 <template>
-  <div class="app-container">
+  <div v-loading.fullscreen="listLoading" element-loading-background="rgba(0, 0, 0, 0.8)" class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.mainAttr" placeholder="主属性" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
-        Search
+      <el-select v-model="listQuery.searchType" placeholder="搜索类型" style="width: 120px">
+        <el-option v-for="item in searchOptions" :key="item.key" :label="item.label" :value="item.key" />
+      </el-select>
+      <el-input v-model="listQuery.keyword" placeholder="关键字" style="width: 150px;" @keyup.enter.native="handleFilter" />
+      <el-select v-model="listQuery.level" placeholder="品质" clearable style="width: 90px">
+        <el-option v-for="item in levelOptions" :key="item" :label="item" :value="item" />
+      </el-select>
+      <el-select v-model="listQuery.mainAttr" placeholder="主属性" clearable style="width: 90px">
+        <el-option v-for="item in attrOptions" :key="item" :label="item" :value="item" />
+      </el-select>
+      <el-select v-model="listQuery.type" filterable placeholder="部位" clearable style="width: 90px">
+        <el-option v-for="item in typeOptions" :key="item" :label="item" :value="item" />
+      </el-select>
+      <el-button v-waves type="primary" icon="el-icon-search" @click="handleFilter">
+        搜索
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
-        Add
+      <el-button v-waves type="primary" @click="resetFilter">
+        清空搜索
       </el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
-        Export
+      <el-button v-waves style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+        添加
       </el-button>
-      <el-checkbox v-model="showLevel" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
-        Level
+      <el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download" @click="handleDownload">
+        导出
+      </el-button>
+      <el-button v-waves type="primary" icon="el-icon-setting">
+        设置加成
+      </el-button>
+      <el-checkbox v-model="showDescription" style="margin-left:15px;" @change="tableKey=tableKey+1">
+        描述
       </el-checkbox>
     </div>
 
     <el-table
       :key="tableKey"
-      v-loading="listLoading"
       :data="list"
       border
       fit
@@ -30,55 +47,70 @@
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="套装名称" align="center">
+      <el-table-column v-if="showDescription" label="描述" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.suitName }}</span>
+          <span>{{ scope.row.description }}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="showLevel" label="品质" width="110px" align="center">
+      <el-table-column label="品质" width="70px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.level }}</span>
+          <div v-html="getLevelHtml(scope.row.level)" />
         </template>
       </el-table-column>
-      <el-table-column label="主属性" width="80px">
+      <el-table-column label="主属性" width="60px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.mainAttr }}</span>
+          <div v-html="getAttrHtml(scope.row.mainAttr)" />
         </template>
       </el-table-column>
-      <el-table-column label="典雅" width="80px">
+      <el-table-column label="部位" width="70px" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.type }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="套装名称" width="150px" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.suit.name || '--' }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="典雅" width="60px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.elegantValue }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="性感" width="80px">
+      <el-table-column label="性感" width="60px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.sexyValue }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="甜美" width="80px">
+      <el-table-column label="甜美" width="60px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.sweetValue }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="清新" width="80px">
+      <el-table-column label="清新" width="60px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.freshValue }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="帅气" width="80px">
+      <el-table-column label="帅气" width="60px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.handsomeValue }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="标签" align="center" width="95">
+      <el-table-column label="标签" align="center" width="120px">
         <template slot-scope="scope">
-          <span>{{ scope.row.label }}</span>
+          <div>
+            <div v-html="getLabelHtml(scope.row.label)" />
+            <div v-if="scope.row.labelValue">
+              <label v-for="(val, key) in scope.row.labelValue.toString().split(/[,，]/)" :key="val+key" class="label text-label">{{ val }}</label>
+            </div>
+          </div>
         </template>
       </el-table-column>
-      <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="120" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            Edit
+            编辑
           </el-button>
         </template>
       </el-table-column>
@@ -87,78 +119,115 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="1000px">
-      <el-form ref="dataForm" :inline="true" :rules="rules" :model="temp" label-position="left" size="mini" label-width="70px" style="width: 950px; margin-left:50px;">
-        <el-row>
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" size="mini" label-width="70px" style="width: 100%; padding: 0 20px; ">
+        <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="服装名称" prop="name">
+            <el-form-item label="名称" prop="name">
               <el-input v-model="temp.name" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
+            <el-form-item label="所属套装" prop="suitName">
+              <el-select v-model="temp.suit" filterable value-key="id" class="filter-item" placeholder="请选择套装" @change="changeSuit">
+                <el-option v-for="suit in suitOptions" :key="suit.id" :label="suit.name" :value="suit" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="8">
             <el-form-item label="品阶" prop="level">
               <el-select v-model="temp.level" class="filter-item" placeholder="请选择品阶">
                 <el-option v-for="level in levelOptions" :key="level" :label="level" :value="level" />
               </el-select>
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="所属套装" prop="suitName">
-              <el-select v-model="temp.suitName" class="filter-item" placeholder="请选择套装">
-                <el-option v-for="suit in suitOptions" :key="suit" :label="suit" :value="suit" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item label="主属性" prop="mainAttr">
               <el-select v-model="temp.mainAttr" class="filter-item" placeholder="请选择属性">
                 <el-option v-for="attr in attrOptions" :key="attr" :label="attr" :value="attr" />
               </el-select>
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="4">
-            <el-form-item label="典雅">
-              <el-input v-model="temp.elegantValue" />
+          <el-col :span="8">
+            <el-form-item label="部位" prop="type">
+              <el-select v-model="temp.type" filterable class="filter-item" placeholder="请选择部位">
+                <el-option v-for="type in typeOptions" :key="type" :label="type" :value="type" />
+              </el-select>
             </el-form-item>
           </el-col>
+        </el-row>
+        <el-row :gutter="20">
           <el-col :span="4">
-            <el-form-item label="甜美">
-              <el-input v-model="temp.sweetValue" />
+            <el-form-item label="典雅">
+              <el-input v-model.number="temp.elegantValue" />
             </el-form-item>
           </el-col>
           <el-col :span="4">
             <el-form-item label="清新">
-              <el-input v-model="temp.freshValue" />
+              <el-input v-model.number="temp.freshValue" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="4">
+            <el-form-item label="甜美">
+              <el-input v-model.number="temp.sweetValue" />
             </el-form-item>
           </el-col>
           <el-col :span="4">
             <el-form-item label="性感">
-              <el-input v-model="temp.sexyValue" />
+              <el-input v-model.number="temp.sexyValue" />
             </el-form-item>
           </el-col>
           <el-col :span="4">
             <el-form-item label="帅气">
-              <el-input v-model="temp.handsomeValue" />
+              <el-input v-model.number="temp.handsomeValue" />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row>
+        <el-row :gutter="20">
+          <el-col :span="6">
+            <el-form-item label="价格类型">
+              <el-input v-model="temp.priceType" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="价格">
+              <el-input v-model.number="temp.price" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="品牌">
+              <el-input v-model="temp.brand" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="拥有数">
+              <el-input v-model.number="temp.amount" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="来源">
               <el-input v-model="temp.source" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="6">
             <el-form-item label="标签">
               <el-input v-model="temp.label" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="标签值">
+              <el-input v-model="temp.labelValue" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-form-item label="图片路径">
           <el-input v-model="temp.imgurl" />
+        </el-form-item>
+        <el-form-item label="描述">
+          <el-input v-model="temp.description" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -174,10 +243,13 @@
 </template>
 
 <script>
-import { fetchList, createClothes, updateClothes } from '@/api/clothes'
-import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import { fetchClothes, addClothes, updateClothes } from '@/api/clothes'
+import { fetchAllSuit } from '@/api/suit'
+import waves from '@/directive/waves'
+import { parseTime, debounce } from '@/utils'
+import { getLabelHtml, getLevelHtml, getAttrHtml } from '@/utils/myapp'
+import Pagination from '@/components/Pagination'
+import { mapState } from 'vuex'
 
 export default {
   name: 'Clothes',
@@ -190,11 +262,13 @@ export default {
       total: 0,
       listLoading: true,
       listQuery: {
-        page: 1,
-        limit: 20,
+        pageIndex: 1,
+        pageSize: 20,
+        searchType: 'name',
+        keyword: '',
         level: undefined,
-        name: undefined,
-        mainAttr: undefined
+        mainAttr: undefined,
+        type: undefined
       },
       dialogStatus: '',
       textMap: {
@@ -202,55 +276,95 @@ export default {
         create: 'Create'
       },
       dialogFormVisible: false,
-      showLevel: false,
+      showDescription: false,
       downloadLoading: false,
       rules: {
+        name: [{ required: true, message: '名称是必选的', trigger: 'blur' }],
         level: [{ required: true, message: '品阶是必选的', trigger: 'change' }],
+        type: [{ required: true, message: '部位是必选的', trigger: 'change' }],
         mainAttr: [{ required: true, message: '主属性是必选的', trigger: 'change' }]
       },
-      levelOptions: ['普通', '稀有', '非凡', '闪耀'],
-      suitOptions: ['无', '抖落繁星', '欲望之音', '璀璨之恋', '晨雾微风', '流光花蔓', '花影瑶'],
-      attrOptions: ['无', '典雅', '清新', '甜美', '性感', '帅气'],
+      searchOptions: [{ label: '名称', key: 'name' }, { label: '标签', key: 'label' }, { label: '套装名称', key: 'suitName' }],
+      suitOptions: [],
       temp: { // 新增数据
         id: undefined,
         name: '',
         level: '',
-        suitId: undefined,
-        suitName: '',
+        type: '',
+        suit: {
+          id: '',
+          name: ''
+        },
         imgurl: '',
         mainAttr: '',
-        soure: '',
-        elegantValue: '',
-        sweetValue: '',
-        freshValue: '',
-        sexyValue: '',
-        handsomeValue: '',
-        price: '',
-        priceType: '',
+        source: '幻之海，幻之海·流光',
+        brand: '',
+        amount: 0,
+        elegantValue: 0,
+        freshValue: 0,
+        sweetValue: 0,
+        sexyValue: 0,
+        handsomeValue: 0,
+        price: 0,
+        priceType: '幻之券',
         label: '',
         labelValue: '',
         description: ''
       }
     }
   },
+  computed: {
+    ...mapState({
+      levelOptions: state => state.app.levelOptions,
+      attrOptions: state => state.app.attrOptions,
+      typeOptions: state => state.app.typeOptions
+    })
+  },
   created() {
     this.getList()
   },
+  async mounted() {
+    this.suitOptions = (await fetchAllSuit()).data.dataList
+  },
   methods: {
+    getLevelHtml,
+    getLabelHtml,
+    getAttrHtml,
     getList() {
       this.listLoading = true
-      fetchList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
+      fetchClothes(this.listQuery).then(response => {
+        this.list = response.data.dataList
+        this.total = response.data.dataMeta.totalCount
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
-        }, 1.5 * 1000)
+        }, 1 * 1000)
       })
     },
+    resetFilter() {
+      return debounce(() => {
+        this.listQuery = {
+          pageIndex: 1,
+          pageSize: 20,
+          searchType: 'name',
+          keyword: '',
+          level: undefined,
+          mainAttr: undefined,
+          type: undefined
+        }
+        this.handleFilter()
+      }, 300)()
+    },
+    changeSuit(suit) {
+      this.temp.level = suit.level
+      this.temp.mainAttr = suit.mainAttr
+      this.temp.label = suit.label
+    },
     handleFilter() {
-      this.listQuery.page = 1
-      this.getList()
+      return debounce(() => {
+        this.listQuery.page = 1
+        this.getList()
+      }, 300)()
     },
     // 重置新建弹框
     resetTemp() {
@@ -258,42 +372,47 @@ export default {
         id: undefined,
         name: '',
         level: '',
-        suitId: undefined,
-        suitName: '',
+        type: '',
+        suit: {
+          id: '',
+          name: ''
+        },
         imgurl: '',
         mainAttr: '',
-        soure: '',
-        elegantValue: '',
-        sweetValue: '',
-        freshValue: '',
-        sexyValue: '',
-        handsomeValue: '',
-        price: '',
-        priceType: '',
+        source: '幻之海，幻之海·流光',
+        brand: '',
+        amount: 0,
+        elegantValue: 0,
+        freshValue: 0,
+        sweetValue: 0,
+        sexyValue: 0,
+        handsomeValue: 0,
+        price: 0,
+        priceType: '幻之券',
         label: '',
         labelValue: '',
         description: ''
       }
     },
     handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
+      return debounce(() => {
+        this.resetTemp()
+        this.dialogStatus = 'create'
+        this.dialogFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
+      }, 300)()
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
-          createClothes(this.temp).then(() => {
+          addClothes(this.temp).then(() => {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.$notify({
-              title: 'Success',
-              message: 'Created Successfully',
+              title: '成功',
+              message: '添加成功',
               type: 'success',
               duration: 2000
             })
@@ -314,6 +433,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
+          console.log('tempData', tempData)
           updateClothes(tempData).then(() => {
             for (const v of this.list) {
               if (v.id === this.temp.id) {
@@ -324,8 +444,8 @@ export default {
             }
             this.dialogFormVisible = false
             this.$notify({
-              title: 'Success',
-              message: 'Update Successfully',
+              title: '成功',
+              message: '更新成功',
               type: 'success',
               duration: 2000
             })
@@ -335,8 +455,8 @@ export default {
     },
     handleDelete(row) {
       this.$notify({
-        title: 'Success',
-        message: 'Delete Successfully',
+        title: '成功',
+        message: '删除成功',
         type: 'success',
         duration: 2000
       })
@@ -344,18 +464,20 @@ export default {
       this.list.splice(index, 1)
     },
     handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['name', 'suitName', 'level', 'mainAttr', 'label']
-        const filterVal = ['name', 'suitName', 'level', 'mainAttr', 'label']
-        const data = this.formatJson(filterVal, this.list)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: 'table-list'
+      return debounce(() => {
+        this.downloadLoading = true
+        import('@/vendor/Export2Excel').then(excel => {
+          const tHeader = ['名称', '品质', '主属性', '部位', '套装名称']
+          const filterVal = ['name', 'level', 'mainAttr', 'type', 'suitName']
+          const data = this.formatJson(filterVal, this.list)
+          excel.export_json_to_excel({
+            header: tHeader,
+            data,
+            filename: 'table-list'
+          })
+          this.downloadLoading = false
         })
-        this.downloadLoading = false
-      })
+      }, 300)()
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => {
@@ -365,14 +487,6 @@ export default {
           return v[j]
         }
       }))
-    },
-    getSortClass: function(key) {
-      const sort = this.listQuery.sort
-      return sort === `+${key}`
-        ? 'ascending'
-        : sort === `-${key}`
-          ? 'descending'
-          : ''
     }
   }
 }

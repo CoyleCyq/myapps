@@ -1,21 +1,28 @@
 <template>
-  <div class="app-container">
+  <div v-loading.fullscreen="listLoading" element-loading-background="rgba(0, 0, 0, 0.8)" class="app-container">
+    <!-- 过滤区域 -->
     <div class="filter-container">
-      <el-input v-model="listQuery.mainAttr" placeholder="主属性" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.name" placeholder="名称" style="width: 120px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-select v-model="listQuery.level" placeholder="品质" clearable style="width: 90px" class="filter-item">
+        <el-option v-for="item in levelOptions" :key="item" :label="item" :value="item" />
+      </el-select>
+      <el-select v-model="listQuery.mainAttr" placeholder="主属性" clearable style="width: 90px" class="filter-item">
+        <el-option v-for="item in attrOptions" :key="item" :label="item" :value="item" />
+      </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
-        Search
+        搜索
       </el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
-        Add
+        添加
       </el-button>
       <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
-        Export
+        导出Excel
       </el-button>
     </div>
 
+    <!-- 主表区域 -->
     <el-table
       :key="tableKey"
-      v-loading="listLoading"
       :data="list"
       border
       fit
@@ -29,15 +36,20 @@
       </el-table-column>
       <el-table-column label="品质" width="110px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.level }}</span>
+          <div v-html="getLevelHtml(scope.row.level)" />
         </template>
       </el-table-column>
-      <el-table-column label="设计师" width="110px" align="center">
+      <el-table-column label="主属性" width="70px" align="center">
+        <template slot-scope="scope">
+          <div v-html="getAttrHtml(scope.row.mainAttr)" />
+        </template>
+      </el-table-column>
+      <el-table-column label="设计师" width="150px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.author }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="来源" width="200px" align="center">
+      <el-table-column label="来源" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.source }}</span>
         </template>
@@ -47,29 +59,24 @@
           <span>{{ scope.row.amount }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="主属性" width="70px">
+      <el-table-column label="标签" align="center" width="120px">
         <template slot-scope="scope">
-          <span>{{ scope.row.mainAttr }}</span>
+          <div v-html="getLabelHtml(scope.row.label)" />
         </template>
       </el-table-column>
-      <el-table-column label="标签" align="center" width="95">
-        <template slot-scope="scope">
-          <span>{{ scope.row.label }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            Edit
+            编辑
           </el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.pageIndex" :limit.sync="listQuery.pageSize" @pagination="getList" />
-
+    <!-- 编辑/新建弹框 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" size="mini" label-width="70px" style="width: 400px; margin-left:50px;">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 90%; margin-left:50px;">
         <el-form-item label="套装名称" prop="name">
           <el-input v-model="temp.name" />
         </el-form-item>
@@ -109,10 +116,12 @@
 </template>
 
 <script>
-import { fetchList, createSuit, updateSuit } from '@/api/suit'
-import waves from '@/directive/waves' // waves directive
+import { fetchSuit, addSuit, updateSuit } from '@/api/suit'
+import waves from '@/directive/waves'
 import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import { getLabelHtml, getLevelHtml, getAttrHtml } from '@/utils/myapp'
+import Pagination from '@/components/Pagination'
+import { mapState } from 'vuex'
 
 export default {
   name: 'Suit',
@@ -142,9 +151,6 @@ export default {
         level: [{ required: true, message: '品阶是必选的', trigger: 'change' }],
         mainAttr: [{ required: true, message: '主属性是必选的', trigger: 'change' }]
       },
-      levelOptions: ['普通', '稀有', '非凡', '闪耀'],
-      suitOptions: ['无', '抖落繁星', '欲望之音', '璀璨之恋', '晨雾微风', '流光花蔓', '花影瑶'],
-      attrOptions: ['无', '典雅', '清新', '甜美', '性感', '帅气'],
       temp: { // 新增数据
         id: undefined,
         name: '',
@@ -157,20 +163,29 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapState({
+      levelOptions: state => state.app.levelOptions,
+      attrOptions: state => state.app.attrOptions
+    })
+  },
   created() {
     this.getList()
   },
   methods: {
+    getLabelHtml,
+    getLevelHtml,
+    getAttrHtml,
     getList() {
       this.listLoading = true
-      fetchList(this.listQuery).then(response => {
+      fetchSuit(this.listQuery).then(response => {
         console.log('res', response)
         this.list = response.data.dataList
         this.total = response.data.dataMeta.totalCount
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
-        }, 1.5 * 1000)
+        }, 1 * 1000)
       })
     },
     handleFilter() {
@@ -201,12 +216,12 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          createSuit(this.temp).then(() => {
+          addSuit(this.temp).then(() => {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.$notify({
-              title: 'Success',
-              message: 'Created Successfully',
+              title: '成功',
+              message: '创建成功',
               type: 'success',
               duration: 2000
             })
@@ -237,8 +252,8 @@ export default {
             }
             this.dialogFormVisible = false
             this.$notify({
-              title: 'Success',
-              message: 'Update Successfully',
+              title: '成功',
+              message: '更新成功',
               type: 'success',
               duration: 2000
             })
@@ -248,8 +263,8 @@ export default {
     },
     handleDelete(row) {
       this.$notify({
-        title: 'Success',
-        message: 'Delete Successfully',
+        title: '成功',
+        message: '删除成功',
         type: 'success',
         duration: 2000
       })
@@ -259,8 +274,8 @@ export default {
     handleDownload() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['name', 'suitName', 'level', 'mainAttr', 'label']
-        const filterVal = ['name', 'suitName', 'level', 'mainAttr', 'label']
+        const tHeader = ['套装名称', '品质', '主属性', '设计师', '来源', '标签']
+        const filterVal = ['name', 'level', 'mainAttr', 'author', 'source', 'label']
         const data = this.formatJson(filterVal, this.list)
         excel.export_json_to_excel({
           header: tHeader,
@@ -278,14 +293,6 @@ export default {
           return v[j]
         }
       }))
-    },
-    getSortClass: function(key) {
-      const sort = this.listQuery.sort
-      return sort === `+${key}`
-        ? 'ascending'
-        : sort === `-${key}`
-          ? 'descending'
-          : ''
     }
   }
 }
