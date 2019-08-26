@@ -2,20 +2,23 @@
   <div v-loading.fullscreen="listLoading" element-loading-background="rgba(0, 0, 0, 0.8)" class="app-container">
     <!-- 过滤区域 -->
     <div class="filter-container">
-      <el-input v-model="listQuery.name" placeholder="名称" style="width: 120px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.level" placeholder="品质" clearable style="width: 90px" class="filter-item">
+      <el-select v-model="listQuery.searchType" placeholder="搜索类型" style="width: 110px">
+        <el-option v-for="item in searchOptions" :key="item.key" :label="item.label" :value="item.key" />
+      </el-select>
+      <el-input v-model="listQuery.keyword" clearable placeholder="关键字" style="width: 120px;" @keyup.enter.native="handleFilter" />
+      <el-select v-model="listQuery.level" placeholder="品质" clearable style="width: 90px">
         <el-option v-for="item in levelOptions" :key="item" :label="item" :value="item" />
       </el-select>
-      <el-select v-model="listQuery.mainAttr" placeholder="主属性" clearable style="width: 90px" class="filter-item">
+      <el-select v-model="listQuery.mainAttr" placeholder="主属性" clearable style="width: 90px">
         <el-option v-for="item in attrOptions" :key="item" :label="item" :value="item" />
       </el-select>
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
+      <el-button v-waves type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+      <el-button v-waves style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         添加
       </el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
+      <el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download" @click="handleDownload">
         导出Excel
       </el-button>
     </div>
@@ -118,7 +121,7 @@
 <script>
 import { fetchSuit, addSuit, updateSuit } from '@/api/suit'
 import waves from '@/directive/waves'
-import { parseTime } from '@/utils'
+import { parseTime, debounce } from '@/utils'
 import { getLabelHtml, getLevelHtml, getAttrHtml } from '@/utils/myapp'
 import Pagination from '@/components/Pagination'
 import { mapState } from 'vuex'
@@ -136,8 +139,9 @@ export default {
       listQuery: {
         pageIndex: 1,
         pageSize: 20,
+        searchType: 'name',
+        keyword: '',
         level: undefined,
-        name: undefined,
         mainAttr: undefined
       },
       dialogStatus: '',
@@ -147,6 +151,7 @@ export default {
       },
       dialogFormVisible: false,
       downloadLoading: false,
+      searchOptions: [{ label: '名称', key: 'name' }, { label: '标签', key: 'label' }, { label: '设计师', key: 'author' }],
       rules: {
         level: [{ required: true, message: '品阶是必选的', trigger: 'change' }],
         mainAttr: [{ required: true, message: '主属性是必选的', trigger: 'change' }]
@@ -189,8 +194,10 @@ export default {
       })
     },
     handleFilter() {
-      this.listQuery.pageIndex = 1
-      this.getList()
+      return debounce(() => {
+        this.listQuery.pageIndex = 1
+        this.getList()
+      }, 300)()
     },
     // 重置新建弹框
     resetTemp() {
@@ -206,12 +213,14 @@ export default {
       }
     },
     handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
+      return debounce(() => {
+        this.resetTemp()
+        this.dialogStatus = 'create'
+        this.dialogFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
+      }, 300)()
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
@@ -272,18 +281,20 @@ export default {
       this.list.splice(index, 1)
     },
     handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['套装名称', '品质', '主属性', '设计师', '来源', '标签']
-        const filterVal = ['name', 'level', 'mainAttr', 'author', 'source', 'label']
-        const data = this.formatJson(filterVal, this.list)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: 'table-list'
+      return debounce(() => {
+        this.downloadLoading = true
+        import('@/vendor/Export2Excel').then(excel => {
+          const tHeader = ['套装名称', '品质', '主属性', '设计师', '来源', '标签']
+          const filterVal = ['name', 'level', 'mainAttr', 'author', 'source', 'label']
+          const data = this.formatJson(filterVal, this.list)
+          excel.export_json_to_excel({
+            header: tHeader,
+            data,
+            filename: 'table-list'
+          })
+          this.downloadLoading = false
         })
-        this.downloadLoading = false
-      })
+      }, 300)()
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => {
