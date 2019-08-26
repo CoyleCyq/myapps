@@ -67,6 +67,11 @@
           <span>{{ scope.row.type }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="设计师" width="80px" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.author }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="套装名称" width="150px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.suit.name || '--' }}</span>
@@ -77,9 +82,9 @@
           <span>{{ scope.row.elegantValue }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="性感" width="60px" align="center">
+      <el-table-column label="清新" width="60px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.sexyValue }}</span>
+          <span>{{ scope.row.freshValue }}</span>
         </template>
       </el-table-column>
       <el-table-column label="甜美" width="60px" align="center">
@@ -87,9 +92,9 @@
           <span>{{ scope.row.sweetValue }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="清新" width="60px" align="center">
+      <el-table-column label="性感" width="60px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.freshValue }}</span>
+          <span>{{ scope.row.sexyValue }}</span>
         </template>
       </el-table-column>
       <el-table-column label="帅气" width="60px" align="center">
@@ -118,19 +123,24 @@
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="1000px">
+    <el-dialog :title="textMap[dialogStatus]" :close-on-click-modal="false" :visible.sync="dialogFormVisible" width="1000px">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" size="mini" label-width="70px" style="width: 100%; padding: 0 20px; ">
         <el-row :gutter="20">
-          <el-col :span="12">
+          <el-col :span="6">
             <el-form-item label="名称" prop="name">
               <el-input v-model="temp.name" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item label="所属套装" prop="suitName">
               <el-select v-model="temp.suit" filterable value-key="id" class="filter-item" placeholder="请选择套装" @change="changeSuit">
                 <el-option v-for="suit in suitOptions" :key="suit.id" :label="suit.name" :value="suit" />
               </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="10">
+            <el-form-item label="设计师" prop="author">
+              <el-input v-model="temp.author" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -295,6 +305,7 @@ export default {
           id: '',
           name: ''
         },
+        author: '',
         imgurl: '',
         mainAttr: '',
         source: '幻之海，幻之海·流光',
@@ -359,6 +370,7 @@ export default {
       this.temp.level = suit.level
       this.temp.mainAttr = suit.mainAttr
       this.temp.label = suit.label
+      this.temp.author = suit.author
     },
     handleFilter() {
       return debounce(() => {
@@ -377,6 +389,7 @@ export default {
           id: '',
           name: ''
         },
+        author: '',
         imgurl: '',
         mainAttr: '',
         source: '幻之海，幻之海·流光',
@@ -407,7 +420,8 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          addClothes(this.temp).then(() => {
+          addClothes(this.temp).then((res) => {
+            this.temp.id = res.data.id
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.$notify({
@@ -421,7 +435,7 @@ export default {
       })
     },
     handleUpdate(row) {
-      console.log('row', row)
+      console.log('更新前', row)
       this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
@@ -433,7 +447,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          console.log('tempData', tempData)
+          console.log('更新后', tempData)
           updateClothes(tempData).then(() => {
             for (const v of this.list) {
               if (v.id === this.temp.id) {
