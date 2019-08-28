@@ -26,11 +26,17 @@
       <el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download" @click="handleDownload">
         导出
       </el-button>
-      <el-button v-waves type="primary" icon="el-icon-setting">
+      <el-button v-waves type="primary" icon="el-icon-setting" @click="calcToolsVisible = true">
+        计算初始
+      </el-button>
+      <el-button v-waves type="primary" icon="el-icon-setting" @click="additionVisible = true">
         设置加成
       </el-button>
       <el-checkbox v-model="showDescription" style="margin-left:15px;" @change="tableKey=tableKey+1">
         描述
+      </el-checkbox>
+      <el-checkbox v-model="showAddition" style="margin-left:15px;">
+        显示加成数值
       </el-checkbox>
     </div>
 
@@ -79,27 +85,27 @@
       </el-table-column>
       <el-table-column label="典雅" width="60px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.elegantValue }}</span>
+          <span>{{ additionValue(scope.row.type, scope.row.elegantValue) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="清新" width="60px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.freshValue }}</span>
+          <span>{{ additionValue(scope.row.type, scope.row.freshValue) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="甜美" width="60px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.sweetValue }}</span>
+          <span>{{ additionValue(scope.row.type, scope.row.sweetValue) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="性感" width="60px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.sexyValue }}</span>
+          <span>{{ additionValue(scope.row.type, scope.row.sexyValue) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="帅气" width="60px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.handsomeValue }}</span>
+          <span>{{ additionValue(scope.row.type, scope.row.handsomeValue) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="标签" align="center" width="120px">
@@ -249,6 +255,159 @@
         </el-button>
       </div>
     </el-dialog>
+
+    <el-dialog title="服装初始计算工具" :close-on-click-modal="false" :visible.sync="calcToolsVisible" width="1000px">
+      <el-form ref="calcform" :model="calcForm" label-position="left" size="mini" label-width="70px" style="width: 100%; padding: 0 20px; ">
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="部位" prop="type">
+              <el-select v-model="calcForm.type" filterable class="filter-item" placeholder="请选择部位">
+                <el-option v-for="type in typeOptions" :key="type" :label="type" :value="type" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="标签值">
+              <el-input v-model.number="calcForm.labelValue" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="4">
+            <el-form-item label="典雅">
+              <el-input v-model.number="calcForm.elegantValue" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="4">
+            <el-form-item label="清新">
+              <el-input v-model.number="calcForm.freshValue" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="4">
+            <el-form-item label="甜美">
+              <el-input v-model.number="calcForm.sweetValue" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="4">
+            <el-form-item label="性感">
+              <el-input v-model.number="calcForm.sexyValue" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="4">
+            <el-form-item label="帅气">
+              <el-input v-model.number="calcForm.handsomeValue" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="5">
+            <el-form-item label="时装">
+              <el-input v-model="calcForm.fashion" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="发型">
+              <el-input v-model="calcForm.hairstyle" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="袜子">
+              <el-input v-model="calcForm.sock" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="鞋子">
+              <el-input v-model="calcForm.shoes" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item label="饰品">
+              <el-input v-model="calcForm.accessories" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="外套">
+              <el-input v-model="calcForm.coat" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="全属性">
+              <el-input v-model="calcForm.all" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="20">
+            <div ref="resultContainer" class="resultContainer" v-text="text" />
+          </el-col>
+          <el-col v-if="text" :span="4">
+            <el-button type="primary" @click="isCopy = true">复制</el-button>
+          </el-col>
+        </el-row>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="calcToolsVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" @click="calcPower">
+          计算
+        </el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="设置加成" :close-on-click-modal="false" :visible.sync="additionVisible" width="1000px">
+      <el-form ref="calcform" :model="calcForm" label-position="left" size="mini" label-width="70px" style="width: 100%; padding: 0 20px; ">
+        <el-row :gutter="20">
+          <el-col :span="5">
+            <el-form-item label="时装">
+              <el-input v-model="calcForm.fashion" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="发型">
+              <el-input v-model="calcForm.hairstyle" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="袜子">
+              <el-input v-model="calcForm.sock" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="鞋子">
+              <el-input v-model="calcForm.shoes" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item label="饰品">
+              <el-input v-model="calcForm.accessories" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="外套">
+              <el-input v-model="calcForm.coat" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="全属性">
+              <el-input v-model="calcForm.all" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="additionVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" @click="saveAddition">
+          保存
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -286,7 +445,10 @@ export default {
         create: 'Create'
       },
       dialogFormVisible: false,
+      calcToolsVisible: false,
       showDescription: false,
+      additionVisible: false,
+      showAddition: false,
       downloadLoading: false,
       rules: {
         name: [{ required: true, message: '名称是必选的', trigger: 'blur' }],
@@ -321,7 +483,33 @@ export default {
         label: '',
         labelValue: '',
         description: ''
-      }
+      },
+      calcForm: {
+        elegantValue: 0,
+        freshValue: 0,
+        sweetValue: 0,
+        sexyValue: 0,
+        handsomeValue: 0,
+        labelValue: 0,
+        type: '',
+        fashion: '0', // 时装穿搭法则
+        hairstyle: '0', // 发型
+        sock: '0', // 袜子
+        shoes: '0', // 鞋子
+        accessories: '0', // 饰品
+        coat: '0', // 外套
+        all: '0' // 所有
+      },
+      text: '', // 初始计算结果文字
+      rawObj: { // 初始计算结果
+        rawElegantValue: 0,
+        rawFreshValue: 0,
+        rawSweetValue: 0,
+        rawSexyValue: 0,
+        rawHandsomeValue: 0,
+        rawLabelValue: 0
+      },
+      isCopy: false // 是否复制
     }
   },
   computed: {
@@ -336,6 +524,16 @@ export default {
   },
   async mounted() {
     this.suitOptions = (await fetchAllSuit()).data.dataList
+    if (localStorage.calcForm) {
+      const calcForm = JSON.parse(localStorage.calcForm)
+      this.calcForm.fashion = calcForm.fashion
+      this.calcForm.hairstyle = calcForm.hairstyle
+      this.calcForm.sock = calcForm.sock
+      this.calcForm.shoes = calcForm.shoes
+      this.calcForm.coat = calcForm.coat
+      this.calcForm.accessories = calcForm.accessories
+      this.calcForm.all = calcForm.all
+    }
   },
   methods: {
     getLevelHtml,
@@ -392,7 +590,7 @@ export default {
         author: '',
         imgurl: '',
         mainAttr: '',
-        source: '设计工坊制作',
+        source: '活动：假日记忆',
         brand: '',
         amount: 0,
         elegantValue: 0,
@@ -401,7 +599,7 @@ export default {
         sexyValue: 0,
         handsomeValue: 0,
         price: 0,
-        priceType: '设计工坊',
+        priceType: '活动券',
         label: '',
         labelValue: '',
         description: ''
@@ -411,6 +609,15 @@ export default {
       return debounce(() => {
         this.resetTemp()
         this.dialogStatus = 'create'
+        if (this.isCopy) {
+          this.temp.elegantValue = this.rawObj.rawElegantValue
+          this.temp.freshValue = this.rawObj.rawFreshValue
+          this.temp.sweetValue = this.rawObj.rawSweetValue
+          this.temp.sexyValue = this.rawObj.rawSexyValue
+          this.temp.handsomeValue = this.rawObj.rawHandsomeValue
+          this.temp.labelValue = `${this.rawObj.rawLabelValue},${this.rawObj.rawLabelValue}`
+          this.temp.type = this.calcForm.type
+        }
         this.dialogFormVisible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
@@ -424,6 +631,7 @@ export default {
             this.temp.id = res.data.id
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
+            this.isCopy = false
             this.$notify({
               title: '成功',
               message: '添加成功',
@@ -501,6 +709,91 @@ export default {
           return v[j]
         }
       }))
+    },
+    calcPower() {
+      if (this.calcForm.type) {
+        this.rawObj = {
+          rawElegantValue: 0,
+          rawFreshValue: 0,
+          rawSweetValue: 0,
+          rawSexyValue: 0,
+          rawHandsomeValue: 0,
+          rawLabelValue: 0
+        }
+        let calcNumber = 0
+        if (this.calcForm.type === '发型') {
+          console.log('我是发型设计')
+          calcNumber = Number(this.calcForm.hairstyle) + Number(this.calcForm.all)
+          console.log('calcNumber', calcNumber)
+        }
+        if (['连衣裙', '上衣', '下装'].indexOf(this.calcForm.type) > -1) {
+          console.log('我是时装设计')
+          calcNumber = Number(this.calcForm.fashion) + Number(this.calcForm.all)
+          console.log('calcNumber', calcNumber)
+        }
+        if (this.calcForm.type === '袜子') {
+          console.log('我是袜子设计')
+          calcNumber = Number(this.calcForm.sock) + Number(this.calcForm.all)
+          console.log('calcNumber', calcNumber)
+        }
+        if (this.calcForm.type === '鞋子') {
+          console.log('我是鞋子设计')
+          calcNumber = Number(this.calcForm.shoes) + Number(this.calcForm.all)
+          console.log('calcNumber', calcNumber)
+        }
+        if (['头饰', '耳饰', '颈饰', '手套', '手饰', '手持物', '特殊'].indexOf(this.calcForm.type) > -1) {
+          console.log('我是饰品设计')
+          calcNumber = Number(this.calcForm.accessories) + Number(this.calcForm.all)
+          console.log('calcNumber', calcNumber)
+        }
+        if (this.calcForm.type === '外套') {
+          console.log('我是外套设计')
+          calcNumber = Number(this.calcForm.coat) + Number(this.calcForm.all)
+          console.log('calcNumber', calcNumber)
+        }
+        this.rawObj.rawElegantValue = Math.ceil(this.calcForm.elegantValue / (1 + calcNumber / 100))
+        this.rawObj.rawFreshValue = Math.ceil(this.calcForm.freshValue / (1 + calcNumber / 100))
+        this.rawObj.rawSweetValue = Math.ceil(this.calcForm.sweetValue / (1 + calcNumber / 100))
+        this.rawObj.rawSexyValue = Math.ceil(this.calcForm.sexyValue / (1 + calcNumber / 100))
+        this.rawObj.rawHandsomeValue = Math.ceil(this.calcForm.handsomeValue / (1 + calcNumber / 100))
+        this.rawObj.rawLabelValue = Math.ceil(this.calcForm.labelValue / (1 + calcNumber / 100))
+        // console.log(this.calcForm.elegantValue/(1+calcNumber / 100), this.calcForm.freshValue/(1+calcNumber/100), this.calcForm.sweetValue/(1+calcNumber/100), this.calcForm.sexyValue/(1+calcNumber/100), this.calcForm.handsomeValue/(1+calcNumber/100))
+        this.text = `原始典雅值：${this.rawObj.rawElegantValue},  原始清新值：${this.rawObj.rawFreshValue}， 原始甜美值：${this.rawObj.rawSweetValue},  原始性感值：${this.rawObj.rawSexyValue},  原始帅气值：${this.rawObj.rawHandsomeValue},  原始标签值：${this.rawObj.rawLabelValue}`
+        // this.$refs.resultContainer.innerText = text
+        localStorage.calcForm = JSON.stringify(this.calcForm)
+      }
+    },
+    additionValue(type, value) {
+      if (this.showAddition) {
+        let calcNumber = 0
+        let resValue = 0
+        if (type === '发型') {
+          calcNumber = Number(this.calcForm.hairstyle) + Number(this.calcForm.all)
+        }
+        if (['连衣裙', '上衣', '下装'].indexOf(type) > -1) {
+          calcNumber = Number(this.calcForm.fashion) + Number(this.calcForm.all)
+        }
+        if (type === '袜子') {
+          calcNumber = Number(this.calcForm.sock) + Number(this.calcForm.all)
+        }
+        if (type === '鞋子') {
+          calcNumber = Number(this.calcForm.shoes) + Number(this.calcForm.all)
+        }
+        if (['头饰', '耳饰', '颈饰', '手套', '手饰', '手持物', '特殊'].indexOf(type) > -1) {
+          calcNumber = Number(this.calcForm.accessories) + Number(this.calcForm.all)
+        }
+        if (type === '外套') {
+          calcNumber = Number(this.calcForm.coat) + Number(this.calcForm.all)
+        }
+        resValue = Math.floor(value * (1 + calcNumber / 100))
+        return resValue
+      } else {
+        return value
+      }
+    },
+    saveAddition() {
+      localStorage.calcForm = JSON.stringify(this.calcForm)
+      this.additionVisible = false
     }
   }
 }
