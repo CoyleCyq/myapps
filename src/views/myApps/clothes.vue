@@ -110,12 +110,13 @@
       </el-table-column>
       <el-table-column label="标签" align="center" width="120px">
         <template slot-scope="scope">
-          <div>
+          <div v-if="scope.row.label">
             <div v-html="getLabelHtml(scope.row.label)" />
             <div v-if="scope.row.labelValue">
               <label v-for="(val, key) in scope.row.labelValue.toString().split(/[,，]/)" :key="val+key" class="label text-label">{{ val }}</label>
             </div>
           </div>
+          <div v-else>--</div>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="120" class-name="small-padding fixed-width">
@@ -129,7 +130,7 @@
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.pageIndex" :limit.sync="listQuery.pageSize" @pagination="getList" />
 
-    <el-dialog :title="textMap[dialogStatus]" :close-on-click-modal="false" :visible.sync="dialogFormVisible" width="1000px">
+    <el-dialog v-el-drag-dialog :title="textMap[dialogStatus]" :close-on-click-modal="false" :visible.sync="dialogFormVisible" width="1000px">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" size="mini" label-width="70px" style="width: 100%; padding: 0 20px; ">
         <el-row :gutter="20">
           <el-col :span="6">
@@ -203,7 +204,9 @@
         <el-row :gutter="20">
           <el-col :span="6">
             <el-form-item label="价格类型">
-              <el-input v-model="temp.priceType" />
+              <el-select v-model="temp.priceType" filterable class="filter-item" placeholder="请选择类型">
+                <el-option v-for="type in priceTypeOptions" :key="type" :label="type" :value="type" />
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="6">
@@ -235,7 +238,7 @@
           </el-col>
           <el-col :span="6">
             <el-form-item label="标签值">
-              <el-input v-model="temp.labelValue" />
+              <el-input v-model="temp.labelValue" @keyup.native="temp.labelValue = completeValue(temp.labelValue, $event)" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -256,7 +259,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="服装初始计算工具" :close-on-click-modal="false" :visible.sync="calcToolsVisible" width="1000px">
+    <el-dialog v-el-drag-dialog title="服装初始计算工具" :close-on-click-modal="false" :visible.sync="calcToolsVisible" width="1000px">
       <el-form ref="calcform" :model="calcForm" label-position="left" size="mini" label-width="70px" style="width: 100%; padding: 0 20px; ">
         <el-row :gutter="20">
           <el-col :span="12">
@@ -357,7 +360,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="设置加成" :close-on-click-modal="false" :visible.sync="additionVisible" width="1000px">
+    <el-dialog v-el-drag-dialog title="设置加成" :close-on-click-modal="false" :visible.sync="additionVisible" width="1000px">
       <el-form ref="calcform" :model="calcForm" label-position="left" size="mini" label-width="70px" style="width: 100%; padding: 0 20px; ">
         <el-row :gutter="20">
           <el-col :span="5">
@@ -415,6 +418,7 @@
 import { fetchClothes, addClothes, updateClothes } from '@/api/clothes'
 import { fetchAllSuit } from '@/api/suit'
 import waves from '@/directive/waves'
+import elDragDialog from '@/directive/el-drag-dialog'
 import { parseTime, debounce } from '@/utils'
 import { getLabelHtml, getLevelHtml, getAttrHtml } from '@/utils/myapp'
 import Pagination from '@/components/Pagination'
@@ -423,7 +427,7 @@ import { mapState } from 'vuex'
 export default {
   name: 'Clothes',
   components: { Pagination },
-  directives: { waves },
+  directives: { waves, elDragDialog },
   data() {
     return {
       tableKey: 0,
@@ -456,8 +460,9 @@ export default {
         type: [{ required: true, message: '部位是必选的', trigger: 'change' }],
         mainAttr: [{ required: true, message: '主属性是必选的', trigger: 'change' }]
       },
-      searchOptions: [{ label: '名称', key: 'name' }, { label: '标签', key: 'label' }, { label: '套装名称', key: 'suitName' }],
+      searchOptions: [{ label: '名称', key: 'name' }, { label: '标签', key: 'label' }, { label: '套装名称', key: 'suitName' }, { label: '来源', key: 'source' }, { label: '描述', key: 'description' }, { label: '设计师', key: 'author' }, { label: '价格类型', key: 'priceType' }, { label: '品牌', key: 'brand' }],
       suitOptions: [],
+      priceTypeOptions: ['活动券', '免费', '幻之券', '谜之券', '礼赞之花', '金币', '钻石', '联盟币'],
       temp: { // 新增数据
         id: undefined,
         name: '',
@@ -581,7 +586,7 @@ export default {
       this.temp = {
         id: undefined,
         name: '',
-        level: '',
+        level: '稀有',
         type: '',
         suit: {
           id: '',
@@ -590,7 +595,7 @@ export default {
         author: '',
         imgurl: '',
         mainAttr: '',
-        source: '活动：假日记忆',
+        source: '活动：假日记忆', //
         brand: '',
         amount: 0,
         elegantValue: 0,
@@ -599,7 +604,7 @@ export default {
         sexyValue: 0,
         handsomeValue: 0,
         price: 0,
-        priceType: '活动券',
+        priceType: '活动券', //
         label: '',
         labelValue: '',
         description: ''
@@ -722,34 +727,22 @@ export default {
         }
         let calcNumber = 0
         if (this.calcForm.type === '发型') {
-          console.log('我是发型设计')
           calcNumber = Number(this.calcForm.hairstyle) + Number(this.calcForm.all)
-          console.log('calcNumber', calcNumber)
         }
         if (['连衣裙', '上衣', '下装'].indexOf(this.calcForm.type) > -1) {
-          console.log('我是时装设计')
           calcNumber = Number(this.calcForm.fashion) + Number(this.calcForm.all)
-          console.log('calcNumber', calcNumber)
         }
         if (this.calcForm.type === '袜子') {
-          console.log('我是袜子设计')
           calcNumber = Number(this.calcForm.sock) + Number(this.calcForm.all)
-          console.log('calcNumber', calcNumber)
         }
         if (this.calcForm.type === '鞋子') {
-          console.log('我是鞋子设计')
           calcNumber = Number(this.calcForm.shoes) + Number(this.calcForm.all)
-          console.log('calcNumber', calcNumber)
         }
         if (['头饰', '耳饰', '颈饰', '手套', '手饰', '手持物', '特殊'].indexOf(this.calcForm.type) > -1) {
-          console.log('我是饰品设计')
           calcNumber = Number(this.calcForm.accessories) + Number(this.calcForm.all)
-          console.log('calcNumber', calcNumber)
         }
         if (this.calcForm.type === '外套') {
-          console.log('我是外套设计')
           calcNumber = Number(this.calcForm.coat) + Number(this.calcForm.all)
-          console.log('calcNumber', calcNumber)
         }
         this.rawObj.rawElegantValue = Math.ceil(this.calcForm.elegantValue / (1 + calcNumber / 100))
         this.rawObj.rawFreshValue = Math.ceil(this.calcForm.freshValue / (1 + calcNumber / 100))
@@ -757,9 +750,7 @@ export default {
         this.rawObj.rawSexyValue = Math.ceil(this.calcForm.sexyValue / (1 + calcNumber / 100))
         this.rawObj.rawHandsomeValue = Math.ceil(this.calcForm.handsomeValue / (1 + calcNumber / 100))
         this.rawObj.rawLabelValue = Math.ceil(this.calcForm.labelValue / (1 + calcNumber / 100))
-        // console.log(this.calcForm.elegantValue/(1+calcNumber / 100), this.calcForm.freshValue/(1+calcNumber/100), this.calcForm.sweetValue/(1+calcNumber/100), this.calcForm.sexyValue/(1+calcNumber/100), this.calcForm.handsomeValue/(1+calcNumber/100))
         this.text = `原始典雅值：${this.rawObj.rawElegantValue},  原始清新值：${this.rawObj.rawFreshValue}， 原始甜美值：${this.rawObj.rawSweetValue},  原始性感值：${this.rawObj.rawSexyValue},  原始帅气值：${this.rawObj.rawHandsomeValue},  原始标签值：${this.rawObj.rawLabelValue}`
-        // this.$refs.resultContainer.innerText = text
         localStorage.calcForm = JSON.stringify(this.calcForm)
       }
     },
@@ -794,6 +785,12 @@ export default {
     saveAddition() {
       localStorage.calcForm = JSON.stringify(this.calcForm)
       this.additionVisible = false
+    },
+    completeValue(labelValue, e) {
+      if (e.keyCode === 188) {
+        return `${parseInt(labelValue)}, ${parseInt(labelValue)}`
+      }
+      return labelValue
     }
   }
 }
