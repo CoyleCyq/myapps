@@ -7,8 +7,8 @@ const state = {
   },
   device: 'desktop',
   size: Cookies.get('size') || 'medium',
-  levelOptions: ['普通', '稀有', '非凡', '闪耀'],
-  attrOptions: ['典雅', '清新', '甜美', '性感', '帅气'],
+  levelOptions: [{ label: '普通', value: '1' }, { label: '稀有', value: '2' }, { label: '非凡', value: '3' }, { label: '闪耀', value: '4' }],
+  attrOptions: [{ label: '典雅', value: '1' }, { label: '清新', value: '2' }, { label: '甜美', value: '3' }, { label: '性感', value: '4' }, { label: '帅气', value: '5' }],
   typeOptions: ['发型', '连衣裙', '外套', '上衣', '下装', '袜子', '鞋子', '头饰', '耳饰', '颈饰', '手饰', '手套', '手持物', '特殊', '底妆', '睫毛', '眉妆', '美瞳', '唇妆']
 }
 

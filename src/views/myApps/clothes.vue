@@ -6,10 +6,10 @@
       </el-select>
       <el-input v-model="listQuery.keyword" clearable placeholder="关键字" style="width: 120px;" @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.level" placeholder="品质" clearable style="width: 90px">
-        <el-option v-for="item in levelOptions" :key="item" :label="item" :value="item" />
+        <el-option v-for="level in levelOptions" :key="level.label" :label="level.label" :value="level.value" />
       </el-select>
       <el-select v-model="listQuery.mainAttr" placeholder="主属性" clearable style="width: 90px">
-        <el-option v-for="item in attrOptions" :key="item" :label="item" :value="item" />
+        <el-option v-for="attr in attrOptions" :key="attr.label" :label="attr.label" :value="attr.value" />
       </el-select>
       <el-select v-model="listQuery.type" filterable placeholder="部位" clearable style="width: 90px">
         <el-option v-for="item in typeOptions" :key="item" :label="item" :value="item" />
@@ -20,24 +20,32 @@
       <el-button v-waves type="primary" @click="resetFilter">
         清空搜索
       </el-button>
-      <el-button v-waves style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+      <el-button v-if="isAdmin" v-waves style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         添加
       </el-button>
       <el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download" @click="handleDownload">
         导出
       </el-button>
-      <el-button v-waves type="primary" icon="el-icon-setting" @click="calcToolsVisible = true">
+      <el-button v-if="isAdmin" v-waves type="primary" icon="el-icon-setting" @click="calcToolsVisible = true">
         计算初始
       </el-button>
       <el-button v-waves type="primary" icon="el-icon-setting" @click="additionVisible = true">
         设置加成
       </el-button>
-      <el-checkbox v-model="showDescription" style="margin-left:15px;" @change="tableKey=tableKey+1">
-        描述
-      </el-checkbox>
-      <el-checkbox v-model="showAddition" style="margin-left:15px;">
-        显示加成数值
-      </el-checkbox>
+      <div class="margin-top-10">
+        <el-checkbox v-model="showDescription" @change="tableKey=tableKey+1">
+          描述
+        </el-checkbox>
+        <el-checkbox v-model="showLabel" @change="tableKey=tableKey+1">
+          标签
+        </el-checkbox>
+        <el-checkbox v-model="showSource" @change="tableKey=tableKey+1">
+          来源
+        </el-checkbox>
+        <el-checkbox v-model="showAddition">
+          显示加成数值
+        </el-checkbox>
+      </div>
     </div>
 
     <el-table
@@ -108,20 +116,25 @@
           <span>{{ additionValue(scope.row.type, scope.row.handsomeValue) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="标签" align="center" width="120px">
+      <el-table-column v-if="showLabel" label="标签" align="center" width="120px">
         <template slot-scope="scope">
           <div v-if="scope.row.label">
             <div v-html="getLabelHtml(scope.row.label)" />
             <div v-if="scope.row.labelValue">
-              <label v-for="(val, key) in scope.row.labelValue.toString().split(/[,，]/)" :key="val+key" class="label text-label">{{ val }}</label>
+              <label v-for="(val, key) in scope.row.labelValue.toString().split(/[,，]/)" :key="val+key" class="label text-label">{{ additionValue(scope.row.type, val) }}</label>
             </div>
           </div>
           <div v-else>--</div>
         </template>
       </el-table-column>
+      <el-table-column v-if="showSource" label="来源" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.source }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" width="120" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
+          <el-button v-if="isAdmin" type="primary" size="mini" @click="handleUpdate(row)">
             编辑
           </el-button>
         </template>
@@ -155,14 +168,14 @@
           <el-col :span="8">
             <el-form-item label="品阶" prop="level">
               <el-select v-model="temp.level" class="filter-item" placeholder="请选择品阶">
-                <el-option v-for="level in levelOptions" :key="level" :label="level" :value="level" />
+                <el-option v-for="level in levelOptions" :key="level.label" :label="level.label" :value="level.value" />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="主属性" prop="mainAttr">
               <el-select v-model="temp.mainAttr" class="filter-item" placeholder="请选择属性">
-                <el-option v-for="attr in attrOptions" :key="attr" :label="attr" :value="attr" />
+                <el-option v-for="attr in attrOptions" :key="attr.label" :label="attr.label" :value="attr.value" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -448,11 +461,13 @@ export default {
         update: 'Edit',
         create: 'Create'
       },
-      dialogFormVisible: false,
       calcToolsVisible: false,
       showDescription: false,
-      additionVisible: false,
+      showLabel: true,
+      showSource: false,
       showAddition: false,
+      additionVisible: false,
+      dialogFormVisible: false,
       downloadLoading: false,
       rules: {
         name: [{ required: true, message: '名称是必选的', trigger: 'blur' }],
@@ -522,7 +537,18 @@ export default {
       levelOptions: state => state.app.levelOptions,
       attrOptions: state => state.app.attrOptions,
       typeOptions: state => state.app.typeOptions
-    })
+    }),
+    isAdmin: {
+      get() {
+        return this.$store.state.settings.isAdmin
+      },
+      set(val) {
+        this.$store.dispatch('settings/changeSetting', {
+          key: 'isAdmin',
+          value: val
+        })
+      }
+    }
   },
   created() {
     this.getList()
@@ -539,6 +565,7 @@ export default {
       this.calcForm.accessories = calcForm.accessories
       this.calcForm.all = calcForm.all
     }
+    console.log('isadmin', this.isAdmin)
   },
   methods: {
     getLevelHtml,
@@ -586,7 +613,7 @@ export default {
       this.temp = {
         id: undefined,
         name: '',
-        level: '稀有',
+        level: '',
         type: '',
         suit: {
           id: '',

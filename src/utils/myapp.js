@@ -44,10 +44,10 @@ export function getLabelHtml(labelStr) {
 export function getLevelHtml(levelStr) {
   if (!levelStr) return ''
   const levelObj = {
-    '普通': '<label class="label label-sm" style="background: #9E98BE">普通</label>',
-    '稀有': '<label class="label label-sm" style="background: #AE7E65">稀有</label>',
-    '非凡': '<label class="label label-sm" style="background: #92A3BF">非凡</label>',
-    '闪耀': '<label class="label label-sm" style="background: #EFAE41">闪耀</label>'
+    '1': '<label class="label label-sm" style="background: #9E98BE">普通</label>',
+    '2': '<label class="label label-sm" style="background: #AE7E65">稀有</label>',
+    '3': '<label class="label label-sm" style="background: #92A3BF">非凡</label>',
+    '4': '<label class="label label-sm" style="background: #EFAE41">闪耀</label>'
   }
   return levelObj[levelStr] || ''
 }
@@ -60,11 +60,11 @@ export function getLevelHtml(levelStr) {
 export function getAttrHtml(attrStr) {
   if (!attrStr) return ''
   const attrObj = {
-    '典雅': '<label class="label label-sm attr-label" style="background: #E7AB71">典雅</label>',
-    '清新': '<label class="label label-sm attr-label" style="background: #72CBB0">清新</label>',
-    '甜美': '<label class="label label-sm attr-label" style="background: #FF8396">甜美</label>',
-    '性感': '<label class="label label-sm attr-label" style="background: #A470B2">性感</label>',
-    '帅气': '<label class="label label-sm attr-label" style="background: #8EB1FC">帅气</label>'
+    '1': '<label class="label label-sm attr-label" style="background: #E7AB71">典雅</label>',
+    '2': '<label class="label label-sm attr-label" style="background: #72CBB0">清新</label>',
+    '3': '<label class="label label-sm attr-label" style="background: #FF8396">甜美</label>',
+    '4': '<label class="label label-sm attr-label" style="background: #A470B2">性感</label>',
+    '5': '<label class="label label-sm attr-label" style="background: #8EB1FC">帅气</label>'
   }
   return attrObj[attrStr] || ''
 }

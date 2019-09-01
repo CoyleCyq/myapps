@@ -7,19 +7,22 @@
       </el-select>
       <el-input v-model="listQuery.keyword" clearable placeholder="关键字" style="width: 120px;" @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.level" placeholder="品质" clearable style="width: 90px">
-        <el-option v-for="item in levelOptions" :key="item" :label="item" :value="item" />
+        <el-option v-for="level in levelOptions" :key="level.label" :label="level.label" :value="level.value" />
       </el-select>
       <el-select v-model="listQuery.mainAttr" placeholder="主属性" clearable style="width: 90px">
-        <el-option v-for="item in attrOptions" :key="item" :label="item" :value="item" />
+        <el-option v-for="attr in attrOptions" :key="attr.label" :label="attr.label" :value="attr.value" />
       </el-select>
       <el-button v-waves type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
-      <el-button v-waves style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+      <el-button v-waves type="primary" @click="resetFilter">
+        清空搜索
+      </el-button>
+      <el-button v-if="isAdmin" v-waves style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         添加
       </el-button>
       <el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download" @click="handleDownload">
-        导出Excel
+        导出
       </el-button>
     </div>
 
@@ -67,9 +70,9 @@
           <div v-html="getLabelHtml(scope.row.label)" />
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="100" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
+          <el-button v-if="isAdmin" type="primary" size="mini" @click="handleUpdate(row)">
             编辑
           </el-button>
         </template>
@@ -78,19 +81,19 @@
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.pageIndex" :limit.sync="listQuery.pageSize" @pagination="getList" />
     <!-- 编辑/新建弹框 -->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog v-el-drag-dialog :close-on-click-modal="false" :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 90%; margin-left:50px;">
         <el-form-item label="套装名称" prop="name">
           <el-input v-model="temp.name" />
         </el-form-item>
         <el-form-item label="品阶" prop="level">
           <el-select v-model="temp.level" class="filter-item" placeholder="请选择品阶">
-            <el-option v-for="level in levelOptions" :key="level" :label="level" :value="level" />
+            <el-option v-for="level in levelOptions" :key="level.label" :label="level.label" :value="level.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="主属性" prop="mainAttr">
           <el-select v-model="temp.mainAttr" class="filter-item" placeholder="请选择属性">
-            <el-option v-for="attr in attrOptions" :key="attr" :label="attr" :value="attr" />
+            <el-option v-for="attr in attrOptions" :key="attr.label" :label="attr.label" :value="attr.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="设计师">
@@ -121,6 +124,7 @@
 <script>
 import { fetchSuit, addSuit, updateSuit } from '@/api/suit'
 import waves from '@/directive/waves'
+import elDragDialog from '@/directive/el-drag-dialog'
 import { parseTime, debounce } from '@/utils'
 import { getLabelHtml, getLevelHtml, getAttrHtml } from '@/utils/myapp'
 import Pagination from '@/components/Pagination'
@@ -129,7 +133,7 @@ import { mapState } from 'vuex'
 export default {
   name: 'Suit',
   components: { Pagination },
-  directives: { waves },
+  directives: { waves, elDragDialog },
   data() {
     return {
       tableKey: 0,
@@ -151,7 +155,7 @@ export default {
       },
       dialogFormVisible: false,
       downloadLoading: false,
-      searchOptions: [{ label: '名称', key: 'name' }, { label: '标签', key: 'label' }, { label: '设计师', key: 'author' }],
+      searchOptions: [{ label: '名称', key: 'name' }, { label: '标签', key: 'label' }, { label: '设计师', key: 'author' }, { label: '来源', key: 'source' }],
       rules: {
         level: [{ required: true, message: '品阶是必选的', trigger: 'change' }],
         mainAttr: [{ required: true, message: '主属性是必选的', trigger: 'change' }]
@@ -172,7 +176,12 @@ export default {
     ...mapState({
       levelOptions: state => state.app.levelOptions,
       attrOptions: state => state.app.attrOptions
-    })
+    }),
+    isAdmin: {
+      get() {
+        return this.$store.state.settings.isAdmin
+      }
+    }
   },
   created() {
     this.getList()
@@ -199,6 +208,19 @@ export default {
         this.getList()
       }, 300)()
     },
+    resetFilter() {
+      return debounce(() => {
+        this.listQuery = {
+          pageIndex: 1,
+          pageSize: 20,
+          searchType: 'name',
+          keyword: '',
+          level: undefined,
+          mainAttr: undefined
+        }
+        this.handleFilter()
+      }, 300)()
+    },
     // 重置新建弹框
     resetTemp() {
       this.temp = {
@@ -206,7 +228,7 @@ export default {
         name: '',
         level: '',
         mainAttr: '',
-        source: '',
+        source: '设计师之影升星或真我复苏后',
         author: '',
         amount: '',
         label: ''
@@ -225,7 +247,8 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          addSuit(this.temp).then(() => {
+          addSuit(this.temp).then((res) => {
+            this.temp.id = res.data.id
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.$notify({

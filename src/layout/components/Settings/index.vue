@@ -23,6 +23,12 @@
         <el-switch v-model="sidebarLogo" class="drawer-switch" />
       </div>
 
+      <div v-if="!isAdmin" class="drawer-item">
+        <el-input v-model="password" placeholder="请输入密码" />
+        <el-button class="margin-top-5" type="primary" icon="el-icon-setting" @click="getEditPermission">
+          获取修改权限
+        </el-button>
+      </div>
     </div>
   </div>
 </template>
@@ -33,7 +39,10 @@ import ThemePicker from '@/components/ThemePicker'
 export default {
   components: { ThemePicker },
   data() {
-    return {}
+    return {
+      getEditVisible: false,
+      password: ''
+    }
   },
   computed: {
     fixedHeader: {
@@ -68,7 +77,21 @@ export default {
           value: val
         })
       }
+    },
+    isAdmin: {
+      get() {
+        return this.$store.state.settings.isAdmin
+      },
+      set(val) {
+        this.$store.dispatch('settings/changeSetting', {
+          key: 'isAdmin',
+          value: val
+        })
+      }
     }
+  },
+  created() {
+    this.isAdmin = this.getPermissionInfo()
   },
   methods: {
     themeChange(val) {
@@ -76,6 +99,40 @@ export default {
         key: 'theme',
         value: val
       })
+    },
+    getPermissionInfo() {
+      if (localStorage.permissionInfo) {
+        const permissionInfo = JSON.parse(localStorage.permissionInfo)
+        const now = Date.now()
+        const time = permissionInfo.time
+        const date = permissionInfo.date
+        if ((parseInt(time) + parseInt(date)) < now) {
+          localStorage.removeItem('permissionInfo')
+          return false
+        } else {
+          return permissionInfo.isAdmin
+        }
+      } else {
+        return this.$store.state.settings.isAdmin
+      }
+    },
+    getEditPermission() {
+      if (!this.password) {
+        this.$message.error('密码不能为空')
+        return false
+      }
+      if (this.password === 'coyle123') {
+        this.$message.success('编辑权限获取成功')
+        this.isAdmin = true
+        const permissionInfo = {
+          isAdmin: true,
+          date: Date.now(),
+          time: 3600000 // 60分钟
+        }
+        localStorage.permissionInfo = JSON.stringify(permissionInfo)
+      } else {
+        this.$message.error('权限获取失败！')
+      }
     }
   }
 }

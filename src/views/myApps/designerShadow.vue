@@ -7,19 +7,19 @@
       </el-select>
       <el-input v-model="listQuery.keyword" clearable placeholder="关键字" style="width: 120px;" @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.level" placeholder="品质" clearable style="width: 90px">
-        <el-option v-for="item in levelOptions" :key="item" :label="item" :value="item" />
+        <el-option v-for="level in levelOptions" :key="level.label" :label="level.label" :value="level.value" />
       </el-select>
       <el-select v-model="listQuery.mainAttr" placeholder="主属性" clearable style="width: 90px">
-        <el-option v-for="item in attrOptions" :key="item" :label="item" :value="item" />
+        <el-option v-for="attr in attrOptions" :key="attr.label" :label="attr.label" :value="attr.value" />
       </el-select>
       <el-button v-waves type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
-      <el-button v-waves style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+      <el-button v-if="isAdmin" v-waves style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         添加
       </el-button>
       <el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download" @click="handleDownload">
-        导出Excel
+        导出
       </el-button>
     </div>
 
@@ -79,7 +79,7 @@
       </el-table-column>
       <el-table-column label="操作" align="center" width="120" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
+          <el-button v-if="isAdmin" type="primary" size="mini" @click="handleUpdate(row)">
             编辑
           </el-button>
         </template>
@@ -98,14 +98,14 @@
           <el-col :span="12">
             <el-form-item label="品阶" prop="level">
               <el-select v-model="temp.level" class="filter-item" placeholder="请选择品阶">
-                <el-option v-for="level in levelOptions" :key="level" :label="level" :value="level" />
+                <el-option v-for="level in levelOptions" :key="level.label" :label="level.label" :value="level.value" />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="主属性" prop="mainAttr">
               <el-select v-model="temp.mainAttr" class="filter-item" placeholder="请选择属性">
-                <el-option v-for="attr in attrOptions" :key="attr" :label="attr" :value="attr" />
+                <el-option v-for="attr in attrOptions" :key="attr.label" :label="attr.label" :value="attr.value" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -223,7 +223,12 @@ export default {
     ...mapState({
       levelOptions: state => state.app.levelOptions,
       attrOptions: state => state.app.attrOptions
-    })
+    }),
+    isAdmin: {
+      get() {
+        return this.$store.state.settings.isAdmin
+      }
+    }
   },
   created() {
     this.getList()
@@ -282,7 +287,8 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          addDesignerShadow(this.temp).then(() => {
+          addDesignerShadow(this.temp).then((res) => {
+            this.temp.id = res.data.id
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.$notify({
