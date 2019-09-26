@@ -4,6 +4,7 @@
 @import './element-ui.scss';
 @import './sidebar.scss';
 @import './btn.scss';
+@import './element-variables.scss';
 
 body {
   height: 100%;
@@ -235,4 +236,21 @@ table {
 }
 .margin-right-10 {
   margin-right: 10px !important; 
+}
+
+/* table start*/
+.custom--table {
+  width: 100%;
+  border-collapse: collapse;
+  td,th {
+    border: $--table-border;
+    padding: 10px
+  }
+}
+
+/* table end */
+
+/* color */
+.font-danger {
+  color: red;
 }

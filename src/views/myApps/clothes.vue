@@ -42,6 +42,9 @@
         <el-checkbox v-model="showSource" @change="tableKey=tableKey+1">
           来源
         </el-checkbox>
+        <el-checkbox v-model="showImg">
+          显示图片
+        </el-checkbox>
         <el-checkbox v-model="showAddition">
           显示加成数值
         </el-checkbox>
@@ -61,6 +64,11 @@
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
+      <el-table-column v-if="showImg" label="图片" width="130px" align="center">
+        <template slot-scope="scope">
+          <img v-show="scope.row.imgurl" :src="scope.row.imgurl" style="width: 100px; height: 100px">
+        </template>
+      </el-table-column>
       <el-table-column v-if="showDescription" label="描述" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.description }}</span>
@@ -74,6 +82,7 @@
       <el-table-column label="主属性" width="70px" align="center">
         <template slot-scope="scope">
           <div v-html="getAttrHtml(scope.row.mainAttr)" />
+          <div>{{ scope.row.mainAttrValue }}</div>
         </template>
       </el-table-column>
       <el-table-column label="部位" width="70px" align="center">
@@ -141,14 +150,14 @@
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.pageIndex" :limit.sync="listQuery.pageSize" @pagination="getList" />
+    <pagination v-show="total>0" :page-sizes="[10, 20, 30, 50, 100]" :total="total" :page.sync="listQuery.pageIndex" :limit.sync="listQuery.pageSize" @pagination="getList" />
 
     <el-dialog v-el-drag-dialog :title="textMap[dialogStatus]" :close-on-click-modal="false" :visible.sync="dialogFormVisible" width="1000px">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" size="mini" label-width="70px" style="width: 100%; padding: 0 20px; ">
         <el-row :gutter="20">
           <el-col :span="6">
             <el-form-item label="名称" prop="name">
-              <el-input v-model="temp.name" />
+              <el-input v-model="temp.name" @blur="changeName" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -167,7 +176,7 @@
         <el-row :gutter="20">
           <el-col :span="8">
             <el-form-item label="品阶" prop="level">
-              <el-select v-model="temp.level" class="filter-item" placeholder="请选择品阶">
+              <el-select v-model="temp.level" class="filter-item" placeholder="请选择品阶" @change="changeLevel">
                 <el-option v-for="level in levelOptions" :key="level.label" :label="level.label" :value="level.value" />
               </el-select>
             </el-form-item>
@@ -466,6 +475,7 @@ export default {
       showLabel: true,
       showSource: false,
       showAddition: false,
+      showImg: false,
       additionVisible: false,
       dialogFormVisible: false,
       downloadLoading: false,
@@ -485,7 +495,7 @@ export default {
         type: '',
         suit: {
           id: '',
-          name: ''
+          name: null
         },
         author: '',
         imgurl: '',
@@ -601,7 +611,37 @@ export default {
       this.temp.mainAttr = suit.mainAttr
       this.temp.label = suit.label
       this.temp.author = suit.author
+      this.temp.source = suit.source
     },
+    changeLevel(level) {
+      if (level === '1' && this.temp.labelValue) {
+        const arr = this.temp.labelValue.split(/[,，]/g)
+        this.temp.labelValue = arr[0]
+      }
+    },
+    // changeName() {
+    //   if (this.temp.name.indexOf('袜') > -1) {
+    //     this.temp.type = '袜子'
+    //   } else if (this.temp.name.indexOf('靴') > -1 || this.temp.name.indexOf('鞋') > -1 || this.temp.name.indexOf('履') > -1 || this.temp.name.indexOf('屐') > -1) {
+    //     this.temp.type = '鞋子'
+    //   } else if (this.temp.name.indexOf('裤') > -1) {
+    //     this.temp.type = '下装'
+    //   } else if (this.temp.name.indexOf('背心') > -1 || this.temp.name.indexOf('袖') > -1 || this.temp.name.indexOf('衫') > -1 || this.temp.name.indexOf('吊带') > -1) {
+    //     this.temp.type = '上衣'
+    //   } else if (this.temp.name.indexOf('西装') > -1) {
+    //     this.temp.type = '外套'
+    //   } else if (this.temp.name.indexOf('裙') > -1) {
+    //     this.temp.type = '连衣裙'
+    //   } else if (this.temp.name.indexOf('发') > -1) {
+    //     this.temp.type = '发型'
+    //   } else if (this.temp.name.indexOf('耳') > -1) {
+    //     this.temp.type = '耳饰'
+    //   } else if (this.temp.name.indexOf('帽') > -1) {
+    //     this.temp.type = '头饰'
+    //   } else if (this.temp.name.indexOf('项链') > -1) {
+    //     this.temp.type = '颈饰'
+    //   }
+    // },
     handleFilter() {
       return debounce(() => {
         this.listQuery.pageIndex = 1
@@ -617,12 +657,12 @@ export default {
         type: '',
         suit: {
           id: '',
-          name: ''
+          name: null
         },
         author: '',
         imgurl: '',
         mainAttr: '',
-        source: '活动：假日记忆', //
+        source: '幻之海，流光', //
         brand: '',
         amount: 0,
         elegantValue: 0,
@@ -631,7 +671,7 @@ export default {
         sexyValue: 0,
         handsomeValue: 0,
         price: 0,
-        priceType: '活动券', //
+        priceType: '幻之券', //
         label: '',
         labelValue: '',
         description: ''
@@ -647,8 +687,25 @@ export default {
           this.temp.sweetValue = this.rawObj.rawSweetValue
           this.temp.sexyValue = this.rawObj.rawSexyValue
           this.temp.handsomeValue = this.rawObj.rawHandsomeValue
-          this.temp.labelValue = `${this.rawObj.rawLabelValue},${this.rawObj.rawLabelValue}`
+
+          const mainValue = Math.max(this.rawObj.rawElegantValue, this.rawObj.rawFreshValue, this.rawObj.rawSweetValue, this.rawObj.rawSexyValue, this.rawObj.rawHandsomeValue)
+          for (const objItem in this.rawObj) {
+            if (this.rawObj[objItem] === mainValue) {
+              if (objItem === 'rawElegantValue') {
+                this.temp.mainAttr = '1'
+              } else if (objItem === 'rawFreshValue') {
+                this.temp.mainAttr = '2'
+              } else if (objItem === 'rawSweetValue') {
+                this.temp.mainAttr = '3'
+              } else if (objItem === 'rawSexyValue') {
+                this.temp.mainAttr = '4'
+              } else if (objItem === 'rawHandsomeValue') {
+                this.temp.mainAttr = '5'
+              }
+            }
+          }
           this.temp.type = this.calcForm.type
+          this.temp.labelValue = `${this.rawObj.rawLabelValue},${this.rawObj.rawLabelValue}`
         }
         this.dialogFormVisible = true
         this.$nextTick(() => {
@@ -721,8 +778,8 @@ export default {
       return debounce(() => {
         this.downloadLoading = true
         import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = ['名称', '品质', '主属性', '部位', '套装名称']
-          const filterVal = ['name', 'level', 'mainAttr', 'type', 'suitName']
+          const tHeader = ['名称', '品质', '主属性', '部位', '套装名称', '典雅', '清新', '甜美', '性感', '帅气']
+          const filterVal = ['name', 'level', 'mainAttr', 'type', 'suitName', 'elegantValue', 'freshValue', 'sweetValue', 'sexyValue', 'handsomeValue']
           const data = this.formatJson(filterVal, this.list)
           excel.export_json_to_excel({
             header: tHeader,

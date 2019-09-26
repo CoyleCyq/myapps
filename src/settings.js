@@ -33,5 +33,7 @@ module.exports = {
    */
   errorLog: 'production',
 
-  isAdmin: false
+  accessToken: '24.d437f567357fe70c0fd1991a1706153c.2592000.1571064589.282335-17246661',
+
+  isAdmin: true
 }

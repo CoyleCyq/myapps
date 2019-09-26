@@ -36,12 +36,12 @@ const myAppsRouter = {
       name: 'suit',
       meta: { title: '套装' }
     },
-    {
-      path: 'evalLevelUpCost',
-      component: () => import('@/views/myApps/evalLevelUpCost.vue'),
-      name: 'evalLevelUpCost',
-      meta: { title: '设计师之影计算' }
-    },
+    // {
+    //   path: 'evalLevelUpCost',
+    //   component: () => import('@/views/myApps/evalLevelUpCost.vue'),
+    //   name: 'evalLevelUpCost',
+    //   meta: { title: '设计师之影计算' }
+    // },
     {
       path: 'impression',
       component: () => import('@/views/myApps/impression.vue'),
@@ -54,6 +54,18 @@ const myAppsRouter = {
       name: 'designerShadow',
       meta: { title: '设计师之影' }
     }
+    // {
+    //   path: 'collection',
+    //   component: () => import('@/views/myApps/collection.vue'),
+    //   name: 'collection',
+    //   meta: { title: '馆藏' }
+    // },
+    // {
+    //   path: 'alliance',
+    //   component: () => import('@/views/myApps/alliance.vue'),
+    //   name: 'alliance',
+    //   meta: { title: '联盟计分' }
+    // }
   ]
 }
 export default myAppsRouter
