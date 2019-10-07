@@ -141,10 +141,13 @@
           <span>{{ scope.row.source }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="120" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button v-if="isAdmin" type="primary" size="mini" @click="handleUpdate(row)">
             编辑
+          </el-button>
+          <el-button type="primary" size="mini" @click="handleClipboard(row.id, $event)">
+            复制Id
           </el-button>
         </template>
       </el-table-column>
@@ -157,7 +160,7 @@
         <el-row :gutter="20">
           <el-col :span="6">
             <el-form-item label="名称" prop="name">
-              <el-input v-model="temp.name" @blur="changeName" />
+              <el-input v-model="temp.name" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -443,6 +446,7 @@ import waves from '@/directive/waves'
 import elDragDialog from '@/directive/el-drag-dialog'
 import { parseTime, debounce } from '@/utils'
 import { getLabelHtml, getLevelHtml, getAttrHtml } from '@/utils/myapp'
+import clipboard from '@/utils/clipboard'
 import Pagination from '@/components/Pagination'
 import { mapState } from 'vuex'
 
@@ -458,7 +462,7 @@ export default {
       listLoading: true,
       listQuery: {
         pageIndex: 1,
-        pageSize: 20,
+        pageSize: 100,
         searchType: 'name',
         keyword: '',
         level: undefined,
@@ -596,7 +600,7 @@ export default {
       return debounce(() => {
         this.listQuery = {
           pageIndex: 1,
-          pageSize: 20,
+          pageSize: 100,
           searchType: 'name',
           keyword: '',
           level: undefined,
@@ -618,6 +622,9 @@ export default {
         const arr = this.temp.labelValue.split(/[,，]/g)
         this.temp.labelValue = arr[0]
       }
+    },
+    handleClipboard(text, event) {
+      clipboard(text, event)
     },
     // changeName() {
     //   if (this.temp.name.indexOf('袜') > -1) {
