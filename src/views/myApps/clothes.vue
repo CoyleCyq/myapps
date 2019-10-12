@@ -79,12 +79,13 @@
           <div v-html="getLevelHtml(scope.row.level)" />
         </template>
       </el-table-column>
-      <el-table-column label="主属性" width="70px" align="center">
+      <el-table-column label="主属性" width="90px" align="center">
         <template slot-scope="scope">
           <div v-html="getAttrHtml(scope.row.mainAttr)" />
-          <div>{{ scope.row.mainAttrValue }}</div>
+          <!-- <div>{{ scope.row.mainAttrValue }}</div> -->
         </template>
       </el-table-column>
+      <el-table-column label="属性值" prop="mainAttrValue" sortable width="90px" align="center" />
       <el-table-column label="部位" width="70px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.type }}</span>
@@ -440,7 +441,7 @@
 </template>
 
 <script>
-import { fetchClothes, addClothes, updateClothes } from '@/api/clothes'
+import { fetchClothes, addClothes, updateClothes, fetchAllClothes } from '@/api/clothes'
 import { fetchAllSuit } from '@/api/suit'
 import waves from '@/directive/waves'
 import elDragDialog from '@/directive/el-drag-dialog'
@@ -462,7 +463,7 @@ export default {
       listLoading: true,
       listQuery: {
         pageIndex: 1,
-        pageSize: 100,
+        pageSize: 20,
         searchType: 'name',
         keyword: '',
         level: undefined,
@@ -479,7 +480,7 @@ export default {
       showLabel: true,
       showSource: false,
       showAddition: false,
-      showImg: false,
+      showImg: true,
       additionVisible: false,
       dialogFormVisible: false,
       downloadLoading: false,
@@ -600,7 +601,7 @@ export default {
       return debounce(() => {
         this.listQuery = {
           pageIndex: 1,
-          pageSize: 100,
+          pageSize: 20,
           searchType: 'name',
           keyword: '',
           level: undefined,
@@ -782,12 +783,14 @@ export default {
       this.list.splice(index, 1)
     },
     handleDownload() {
-      return debounce(() => {
+      return debounce(async() => {
         this.downloadLoading = true
+        const clothesData = await fetchAllClothes()
+        // console.log(clothesData)
         import('@/vendor/Export2Excel').then(excel => {
           const tHeader = ['名称', '品质', '主属性', '部位', '套装名称', '典雅', '清新', '甜美', '性感', '帅气']
           const filterVal = ['name', 'level', 'mainAttr', 'type', 'suitName', 'elegantValue', 'freshValue', 'sweetValue', 'sexyValue', 'handsomeValue']
-          const data = this.formatJson(filterVal, this.list)
+          const data = this.formatJson(filterVal, clothesData.data.dataList)
           excel.export_json_to_excel({
             header: tHeader,
             data,
@@ -829,7 +832,7 @@ export default {
         if (this.calcForm.type === '鞋子') {
           calcNumber = Number(this.calcForm.shoes) + Number(this.calcForm.all)
         }
-        if (['头饰', '耳饰', '颈饰', '手套', '手饰', '手持物', '特殊'].indexOf(this.calcForm.type) > -1) {
+        if (['发饰', '帽子', '耳饰', '项链', '项圈', '手套', '手饰', '手持物', '特殊'].indexOf(this.calcForm.type) > -1) {
           calcNumber = Number(this.calcForm.accessories) + Number(this.calcForm.all)
         }
         if (this.calcForm.type === '外套') {
@@ -861,7 +864,7 @@ export default {
         if (type === '鞋子') {
           calcNumber = Number(this.calcForm.shoes) + Number(this.calcForm.all)
         }
-        if (['头饰', '耳饰', '颈饰', '手套', '手饰', '手持物', '特殊'].indexOf(type) > -1) {
+        if (['发饰', '帽子', '耳饰', '项链', '项圈', '手套', '手饰', '手持物', '特殊'].indexOf(type) > -1) {
           calcNumber = Number(this.calcForm.accessories) + Number(this.calcForm.all)
         }
         if (type === '外套') {
