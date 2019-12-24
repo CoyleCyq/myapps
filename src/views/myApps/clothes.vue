@@ -1,160 +1,219 @@
 <template>
   <div v-loading.fullscreen="listLoading" element-loading-background="rgba(0, 0, 0, 0.8)" class="app-container">
-    <div class="filter-container">
-      <el-select v-model="listQuery.searchType" placeholder="搜索类型" style="width: 110px">
-        <el-option v-for="item in searchOptions" :key="item.key" :label="item.label" :value="item.key" />
-      </el-select>
-      <el-input v-model="listQuery.keyword" clearable placeholder="关键字" style="width: 120px;" @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.level" placeholder="品质" clearable style="width: 90px">
-        <el-option v-for="level in levelOptions" :key="level.label" :label="level.label" :value="level.value" />
-      </el-select>
-      <el-select v-model="listQuery.mainAttr" placeholder="主属性" clearable style="width: 90px">
-        <el-option v-for="attr in attrOptions" :key="attr.label" :label="attr.label" :value="attr.value" />
-      </el-select>
-      <el-select v-model="listQuery.type" filterable placeholder="部位" clearable style="width: 90px">
-        <el-option v-for="item in typeOptions" :key="item" :label="item" :value="item" />
-      </el-select>
-      <el-button v-waves type="primary" icon="el-icon-search" @click="handleFilter">
-        搜索
-      </el-button>
-      <el-button v-waves type="primary" @click="resetFilter">
-        清空搜索
-      </el-button>
-      <el-button v-if="isAdmin" v-waves style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
-        添加
-      </el-button>
-      <el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download" @click="handleDownload">
-        导出
-      </el-button>
-      <el-button v-if="isAdmin" v-waves type="primary" icon="el-icon-setting" @click="calcToolsVisible = true">
-        计算初始
-      </el-button>
-      <el-button v-waves type="primary" icon="el-icon-setting" @click="additionVisible = true">
-        设置加成
-      </el-button>
-      <div class="margin-top-10">
-        <el-checkbox v-model="showDescription" @change="tableKey=tableKey+1">
-          描述
-        </el-checkbox>
-        <el-checkbox v-model="showLabel" @change="tableKey=tableKey+1">
-          标签
-        </el-checkbox>
-        <el-checkbox v-model="showSource" @change="tableKey=tableKey+1">
-          来源
-        </el-checkbox>
-        <el-checkbox v-model="showImg">
-          显示图片
-        </el-checkbox>
-        <el-checkbox v-model="showAddition">
-          显示加成数值
-        </el-checkbox>
+    <div class="pc-container hidden-xs-only">
+      <div class="filter-container">
+        <el-select v-model="listQuery.searchType" placeholder="搜索类型" style="width: 110px">
+          <el-option v-for="item in searchOptions" :key="item.key" :label="item.label" :value="item.key" />
+        </el-select>
+        <el-input v-model="listQuery.keyword" clearable placeholder="关键字" style="width: 120px;" @keyup.enter.native="handleFilter" />
+        <el-select v-model="listQuery.level" placeholder="品质" clearable style="width: 90px">
+          <el-option v-for="level in levelOptions" :key="level.label" :label="level.label" :value="level.value" />
+        </el-select>
+        <el-select v-model="listQuery.mainAttr" placeholder="主属性" clearable style="width: 90px">
+          <el-option v-for="attr in attrOptions" :key="attr.label" :label="attr.label" :value="attr.value" />
+        </el-select>
+        <el-select v-model="listQuery.type" filterable placeholder="部位" clearable style="width: 90px">
+          <el-option v-for="item in typeOptions" :key="item" :label="item" :value="item" />
+        </el-select>
+        <el-button v-waves type="primary" icon="el-icon-search" @click="handleFilter">
+          搜索
+        </el-button>
+        <el-button v-waves type="primary" @click="resetFilter">
+          清空搜索
+        </el-button>
+        <el-button v-if="isAdmin" v-waves style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+          添加
+        </el-button>
+        <el-button v-if="isAdmin" v-waves :loading="downloadLoading" type="primary" icon="el-icon-download" @click="handleDownload">
+          导出
+        </el-button>
+        <el-button v-if="isAdmin" v-waves type="primary" icon="el-icon-setting" @click="calcToolsVisible = true">
+          计算初始
+        </el-button>
+        <el-button v-waves type="primary" icon="el-icon-setting" @click="additionVisible = true">
+          设置加成
+        </el-button>
+        <div class="margin-top-10">
+          <el-checkbox v-model="showDescription" @change="tableKey=tableKey+1">
+            描述
+          </el-checkbox>
+          <el-checkbox v-model="showLabel" @change="tableKey=tableKey+1">
+            标签
+          </el-checkbox>
+          <el-checkbox v-model="showSource" @change="tableKey=tableKey+1">
+            来源
+          </el-checkbox>
+          <el-checkbox v-model="showImg">
+            显示图片
+          </el-checkbox>
+          <el-checkbox v-model="showAddition">
+            显示加成数值
+          </el-checkbox>
+        </div>
+      </div>
+      <el-table
+        :key="tableKey"
+        :data="list"
+        border
+        fit
+        highlight-current-row
+        style="width: 100%;"
+      >
+        <el-table-column label="名称" align="center">
+          <template slot-scope="scope">
+            <span>{{ scope.row.name }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column v-if="showImg" label="图片" width="130px" align="center">
+          <template slot-scope="scope">
+            <img v-show="scope.row.imgurl" :src="scope.row.imgurl" style="width: 100px; height: 100px">
+          </template>
+        </el-table-column>
+        <el-table-column v-if="showDescription" label="描述" align="center">
+          <template slot-scope="scope">
+            <span>{{ scope.row.description }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="品质" width="70px" align="center">
+          <template slot-scope="scope">
+            <div v-html="getLevelHtml(scope.row.level)" />
+          </template>
+        </el-table-column>
+        <el-table-column label="主属性" width="90px" align="center">
+          <template slot-scope="scope">
+            <div v-html="getAttrHtml(scope.row.mainAttr)" />
+            <!-- <div>{{ scope.row.mainAttrValue }}</div> -->
+          </template>
+        </el-table-column>
+        <el-table-column label="属性值" prop="mainAttrValue" sortable width="90px" align="center" />
+        <el-table-column label="部位" width="70px" align="center">
+          <template slot-scope="scope">
+            <span>{{ scope.row.type }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="设计师" width="80px" align="center">
+          <template slot-scope="scope">
+            <span>{{ scope.row.author }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="套装名称" width="150px" align="center">
+          <template slot-scope="scope">
+            <span>{{ scope.row.suit.name || '--' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="典雅" width="60px" align="center">
+          <template slot-scope="scope">
+            <span>{{ additionValue(scope.row.type, scope.row.elegantValue) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="清新" width="60px" align="center">
+          <template slot-scope="scope">
+            <span>{{ additionValue(scope.row.type, scope.row.freshValue) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="甜美" width="60px" align="center">
+          <template slot-scope="scope">
+            <span>{{ additionValue(scope.row.type, scope.row.sweetValue) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="性感" width="60px" align="center">
+          <template slot-scope="scope">
+            <span>{{ additionValue(scope.row.type, scope.row.sexyValue) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="帅气" width="60px" align="center">
+          <template slot-scope="scope">
+            <span>{{ additionValue(scope.row.type, scope.row.handsomeValue) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column v-if="showLabel" label="标签" align="center" width="120px">
+          <template slot-scope="scope">
+            <div v-if="scope.row.label">
+              <div v-html="getLabelHtml(scope.row.label)" />
+              <div v-if="scope.row.labelValue">
+                <label v-for="(val, key) in scope.row.labelValue.toString().split(/[,，]/)" :key="val+key" class="label text-label">{{ additionValue(scope.row.type, val) }}</label>
+              </div>
+            </div>
+            <div v-else>--</div>
+          </template>
+        </el-table-column>
+        <el-table-column v-if="showSource" label="来源" align="center">
+          <template slot-scope="scope">
+            <span>{{ scope.row.source }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
+          <template slot-scope="{row}">
+            <el-button v-if="isAdmin" type="primary" size="mini" @click="handleUpdate(row)">
+              编辑
+            </el-button>
+            <el-button type="primary" size="mini" @click="handleClipboard(row.id, $event)">
+              复制Id
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+    <div class="phone-container hidden-sm-and-up">
+      <div class="filter-container">
+        <el-row>
+          <el-col :span="8">
+            <el-select v-model="listQuery.level" size="mini" placeholder="品质" clearable style="width: 90px">
+              <el-option v-for="level in levelOptions" :key="level.label" :label="level.label" :value="level.value" />
+            </el-select>
+          </el-col>
+          <el-col :span="8">
+            <el-select v-model="listQuery.mainAttr" size="mini" placeholder="主属性" clearable style="width: 90px">
+              <el-option v-for="attr in attrOptions" :key="attr.label" :label="attr.label" :value="attr.value" />
+            </el-select>
+          </el-col>
+          <el-col :span="8">
+            <el-select v-model="listQuery.type" size="mini" filterable placeholder="部位" clearable style="width: 90px">
+              <el-option v-for="item in typeOptions" :key="item" :label="item" :value="item" />
+            </el-select>
+          </el-col>
+        </el-row>
+        <el-row class="margin-top-10">
+          <el-col :span="8">
+            <el-select v-model="listQuery.searchType" size="mini" placeholder="搜索类型" style="width: 90px">
+              <el-option v-for="item in searchOptions" :key="item.key" :label="item.label" :value="item.key" />
+            </el-select>
+          </el-col>
+          <el-col :span="8">
+            <el-input v-model="listQuery.keyword" size="mini" clearable placeholder="关键字" style="width: 110px;" @keyup.enter.native="handleFilter" />
+          </el-col>
+          <el-col :span="8">
+            <el-button v-waves type="primary" size="mini" icon="el-icon-search" @click="handleFilter">
+              搜索
+            </el-button>
+          </el-col>
+        </el-row>
+        <el-row class="margin-top-10">
+          <el-col :span="8">
+            <el-button v-waves size="mini" type="primary" @click="resetFilter">
+              清空搜索
+            </el-button>
+          </el-col>
+          <el-col :span="8">
+            <el-button v-waves size="mini" type="primary" icon="el-icon-setting" @click="additionVisible = true">
+              设置加成
+            </el-button>
+          </el-col>
+        </el-row>
+      </div>
+      <div class="clothes-list">
+        <div v-for="(item, index) in list" :key="item.id+index" class="list-item">
+          <el-card :body-style="{ padding: '0px' }">
+            <el-image :src="item.imgurl" class="image" :lazy="true">
+              <div slot="error" class="image-slot">
+                <div class="el-image__error">{{ item.name }} 加载失败</div>
+              </div>
+            </el-image>
+          </el-card>
+        </div>
       </div>
     </div>
-
-    <el-table
-      :key="tableKey"
-      :data="list"
-      border
-      fit
-      highlight-current-row
-      style="width: 100%;"
-    >
-      <el-table-column label="名称" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.name }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column v-if="showImg" label="图片" width="130px" align="center">
-        <template slot-scope="scope">
-          <img v-show="scope.row.imgurl" :src="scope.row.imgurl" style="width: 100px; height: 100px">
-        </template>
-      </el-table-column>
-      <el-table-column v-if="showDescription" label="描述" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.description }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="品质" width="70px" align="center">
-        <template slot-scope="scope">
-          <div v-html="getLevelHtml(scope.row.level)" />
-        </template>
-      </el-table-column>
-      <el-table-column label="主属性" width="90px" align="center">
-        <template slot-scope="scope">
-          <div v-html="getAttrHtml(scope.row.mainAttr)" />
-          <!-- <div>{{ scope.row.mainAttrValue }}</div> -->
-        </template>
-      </el-table-column>
-      <el-table-column label="属性值" prop="mainAttrValue" sortable width="90px" align="center" />
-      <el-table-column label="部位" width="70px" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.type }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="设计师" width="80px" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="套装名称" width="150px" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.suit.name || '--' }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="典雅" width="60px" align="center">
-        <template slot-scope="scope">
-          <span>{{ additionValue(scope.row.type, scope.row.elegantValue) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="清新" width="60px" align="center">
-        <template slot-scope="scope">
-          <span>{{ additionValue(scope.row.type, scope.row.freshValue) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="甜美" width="60px" align="center">
-        <template slot-scope="scope">
-          <span>{{ additionValue(scope.row.type, scope.row.sweetValue) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="性感" width="60px" align="center">
-        <template slot-scope="scope">
-          <span>{{ additionValue(scope.row.type, scope.row.sexyValue) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="帅气" width="60px" align="center">
-        <template slot-scope="scope">
-          <span>{{ additionValue(scope.row.type, scope.row.handsomeValue) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column v-if="showLabel" label="标签" align="center" width="120px">
-        <template slot-scope="scope">
-          <div v-if="scope.row.label">
-            <div v-html="getLabelHtml(scope.row.label)" />
-            <div v-if="scope.row.labelValue">
-              <label v-for="(val, key) in scope.row.labelValue.toString().split(/[,，]/)" :key="val+key" class="label text-label">{{ additionValue(scope.row.type, val) }}</label>
-            </div>
-          </div>
-          <div v-else>--</div>
-        </template>
-      </el-table-column>
-      <el-table-column v-if="showSource" label="来源" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.source }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
-        <template slot-scope="{row}">
-          <el-button v-if="isAdmin" type="primary" size="mini" @click="handleUpdate(row)">
-            编辑
-          </el-button>
-          <el-button type="primary" size="mini" @click="handleClipboard(row.id, $event)">
-            复制Id
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <pagination v-show="total>0" :page-sizes="[10, 20, 30, 50, 100]" :total="total" :page.sync="listQuery.pageIndex" :limit.sync="listQuery.pageSize" @pagination="getList" />
+    <pagination v-show="total>0" :page-sizes="[10, 20, 30, 50, 100]" :layout="!isMobile ? 'total, sizes, prev, pager, next, jumper' : 'pager'" :total="total" :page.sync="listQuery.pageIndex" :limit.sync="listQuery.pageSize" @pagination="getList" />
 
     <el-dialog v-el-drag-dialog :title="textMap[dialogStatus]" :close-on-click-modal="false" :visible.sync="dialogFormVisible" width="1000px">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" size="mini" label-width="70px" style="width: 100%; padding: 0 20px; ">
@@ -386,47 +445,72 @@
       </div>
     </el-dialog>
 
-    <el-dialog v-el-drag-dialog title="设置加成" :close-on-click-modal="false" :visible.sync="additionVisible" width="1000px">
+    <el-dialog v-el-drag-dialog title="设置加成" :close-on-click-modal="false" :visible.sync="additionVisible" :width="!isMobile ? '1000px' : '90%'">
       <el-form ref="calcform" :model="calcForm" label-position="left" size="mini" label-width="70px" style="width: 100%; padding: 0 20px; ">
-        <el-row :gutter="20">
-          <el-col :span="5">
-            <el-form-item label="时装">
-              <el-input v-model="calcForm.fashion" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="5">
-            <el-form-item label="发型">
-              <el-input v-model="calcForm.hairstyle" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="5">
-            <el-form-item label="袜子">
-              <el-input v-model="calcForm.sock" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="5">
-            <el-form-item label="鞋子">
-              <el-input v-model="calcForm.shoes" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="8">
-            <el-form-item label="饰品">
-              <el-input v-model="calcForm.accessories" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="外套">
-              <el-input v-model="calcForm.coat" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="全属性">
-              <el-input v-model="calcForm.all" />
-            </el-form-item>
-          </el-col>
-        </el-row>
+        <div class="hidden-sm-and-up">
+          <el-form-item label="时装">
+            <el-input v-model="calcForm.fashion" />
+          </el-form-item>
+          <el-form-item label="发型">
+            <el-input v-model="calcForm.hairstyle" />
+          </el-form-item>
+          <el-form-item label="袜子">
+            <el-input v-model="calcForm.sock" />
+          </el-form-item>
+          <el-form-item label="鞋子">
+            <el-input v-model="calcForm.shoes" />
+          </el-form-item>
+          <el-form-item label="饰品">
+            <el-input v-model="calcForm.accessories" />
+          </el-form-item>
+          <el-form-item label="外套">
+            <el-input v-model="calcForm.coat" />
+          </el-form-item>
+          <el-form-item label="全属性">
+            <el-input v-model="calcForm.all" />
+          </el-form-item>
+        </div>
+        <div class="hidden-xs-only">
+          <el-row :gutter="20">
+            <el-col :span="5">
+              <el-form-item label="时装">
+                <el-input v-model="calcForm.fashion" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="5">
+              <el-form-item label="发型">
+                <el-input v-model="calcForm.hairstyle" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="5">
+              <el-form-item label="袜子">
+                <el-input v-model="calcForm.sock" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="5">
+              <el-form-item label="鞋子">
+                <el-input v-model="calcForm.shoes" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="8">
+              <el-form-item label="饰品">
+                <el-input v-model="calcForm.accessories" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="外套">
+                <el-input v-model="calcForm.coat" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="全属性">
+                <el-input v-model="calcForm.all" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="additionVisible = false">
@@ -461,6 +545,7 @@ export default {
       list: null,
       total: 0,
       listLoading: true,
+      innerWidth: window.innerWidth,
       listQuery: {
         pageIndex: 1,
         pageSize: 20,
@@ -484,15 +569,16 @@ export default {
       additionVisible: false,
       dialogFormVisible: false,
       downloadLoading: false,
+      detailVisible: false,
       rules: {
         name: [{ required: true, message: '名称是必选的', trigger: 'blur' }],
         level: [{ required: true, message: '品阶是必选的', trigger: 'change' }],
         type: [{ required: true, message: '部位是必选的', trigger: 'change' }],
         mainAttr: [{ required: true, message: '主属性是必选的', trigger: 'change' }]
       },
-      searchOptions: [{ label: '名称', key: 'name' }, { label: '标签', key: 'label' }, { label: '套装名称', key: 'suitName' }, { label: '来源', key: 'source' }, { label: '描述', key: 'description' }, { label: '设计师', key: 'author' }, { label: '价格类型', key: 'priceType' }, { label: '品牌', key: 'brand' }],
+      searchOptions: [{ label: '名称', key: 'name' }, { label: '标签', key: 'label' }, { label: '套装', key: 'suitName' }, { label: '来源', key: 'source' }, { label: '描述', key: 'description' }, { label: '设计师', key: 'author' }, { label: '品牌', key: 'brand' }],
       suitOptions: [],
-      priceTypeOptions: ['活动券', '免费', '幻之券', '谜之券', '礼赞之花', '金币', '钻石', '联盟币'],
+      priceTypeOptions: ['活动券', '免费', '幻之券', '谜之券', '礼赞之花', '金币', '钻石', '星钻', '联盟币'],
       temp: { // 新增数据
         id: undefined,
         name: '',
@@ -553,6 +639,9 @@ export default {
       attrOptions: state => state.app.attrOptions,
       typeOptions: state => state.app.typeOptions
     }),
+    isMobile() {
+      return !!this.$store.state.app.device === 'mobile'
+    },
     isAdmin: {
       get() {
         return this.$store.state.settings.isAdmin
@@ -569,7 +658,8 @@ export default {
     this.getList()
   },
   async mounted() {
-    this.suitOptions = (await fetchAllSuit()).data.dataList
+    const suitData = await fetchAllSuit()
+    this.suitOptions = suitData.data.dataList
     if (localStorage.calcForm) {
       const calcForm = JSON.parse(localStorage.calcForm)
       this.calcForm.fashion = calcForm.fashion
@@ -581,6 +671,7 @@ export default {
       this.calcForm.all = calcForm.all
     }
     console.log('isadmin', this.isAdmin)
+    console.log('isMobile', this.isMobile)
   },
   methods: {
     getLevelHtml,
@@ -627,29 +718,6 @@ export default {
     handleClipboard(text, event) {
       clipboard(text, event)
     },
-    // changeName() {
-    //   if (this.temp.name.indexOf('袜') > -1) {
-    //     this.temp.type = '袜子'
-    //   } else if (this.temp.name.indexOf('靴') > -1 || this.temp.name.indexOf('鞋') > -1 || this.temp.name.indexOf('履') > -1 || this.temp.name.indexOf('屐') > -1) {
-    //     this.temp.type = '鞋子'
-    //   } else if (this.temp.name.indexOf('裤') > -1) {
-    //     this.temp.type = '下装'
-    //   } else if (this.temp.name.indexOf('背心') > -1 || this.temp.name.indexOf('袖') > -1 || this.temp.name.indexOf('衫') > -1 || this.temp.name.indexOf('吊带') > -1) {
-    //     this.temp.type = '上衣'
-    //   } else if (this.temp.name.indexOf('西装') > -1) {
-    //     this.temp.type = '外套'
-    //   } else if (this.temp.name.indexOf('裙') > -1) {
-    //     this.temp.type = '连衣裙'
-    //   } else if (this.temp.name.indexOf('发') > -1) {
-    //     this.temp.type = '发型'
-    //   } else if (this.temp.name.indexOf('耳') > -1) {
-    //     this.temp.type = '耳饰'
-    //   } else if (this.temp.name.indexOf('帽') > -1) {
-    //     this.temp.type = '头饰'
-    //   } else if (this.temp.name.indexOf('项链') > -1) {
-    //     this.temp.type = '颈饰'
-    //   }
-    // },
     handleFilter() {
       return debounce(() => {
         this.listQuery.pageIndex = 1
@@ -794,7 +862,7 @@ export default {
           excel.export_json_to_excel({
             header: tHeader,
             data,
-            filename: 'table-list'
+            filename: '服装' + parseTime(new Date())
           })
           this.downloadLoading = false
         })
@@ -889,3 +957,42 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.phone-container {
+  text-align: center;
+  .image {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .clothes-list {
+    display: flex;
+    justify-content: space-around;
+    flex-flow: row wrap;
+    .list-item {
+      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+      width: 150px;
+      height: 182px;
+      margin: 10px 5px;
+      .el-card {
+        .image {
+          width: 150px;
+          height: 182px;
+          .image-slot {
+            height: 100%;
+          }
+        }
+      }
+    }
+  }
+}
+
+.mobile {
+  .pagination-container {
+    text-align: center;
+    padding: 0 !important;
+  }
+}
+
+</style>
