@@ -66,7 +66,7 @@
         </el-table-column>
         <el-table-column v-if="showImg" label="图片" width="130px" align="center">
           <template slot-scope="scope">
-            <img v-show="scope.row.imgurl" :src="scope.row.imgurl" style="width: 100px; height: 100px">
+            <el-image v-show="scope.row.imgurl" :src="scope.row.imgurl" :lazy="true" :preview-src-list="[scope.row.imgurl]" style="width: 65px; height: 65px" />
           </template>
         </el-table-column>
         <el-table-column v-if="showDescription" label="描述" align="center">
@@ -96,7 +96,7 @@
             <span>{{ scope.row.author }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="套装名称" width="150px" align="center">
+        <el-table-column label="套装名称" width="140px" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.suit.name || '--' }}</span>
           </template>
@@ -206,7 +206,7 @@
           <el-card :body-style="{ padding: '0px' }">
             <el-image :src="item.imgurl" class="image" :lazy="true">
               <div slot="error" class="image-slot">
-                <div class="el-image__error">{{ item.name }} 加载失败</div>
+                <div class="el-image__error">{{ item.name }} <br>加载失败</div>
               </div>
             </el-image>
           </el-card>

@@ -1,5 +1,5 @@
 /**
- * Created by PanJiaChen on 16/11/18.
+ * Created by coyle on 2019-12-26.
  */
 
 /**
@@ -338,7 +338,7 @@ export function addClass(ele, cls) {
 }
 
 /**
- * Remove class from element
+ * 删除指定元素的class名
  * @param {HTMLElement} elm
  * @param {string} cls
  */
@@ -382,4 +382,89 @@ export function numberToChinese(num) {
   if (re === '一十') { re = '十' }
   if (re.match(/^一/) && re.length === 3) { re = re.replace('一', '') }
   return re
+}
+
+/**
+ * 将'key1.key2'形式的字符串分隔成['key1','key2']的数组
+ * @param value {string}
+ * @returns {array}
+ */
+export function splitByDot(value) {
+  if (value) {
+    return value.split('.')
+  } else {
+    return []
+  }
+}
+
+/**
+ * 通过字符串对object多层取值,字符串为'key1.key2'的形式
+ * @param obj {object} 目标对象
+ * @param keyString {string} 形为'key1.key2'的字符串
+ * @returns {*}
+ */
+export function getValByKey(obj, keyString) {
+  let result = obj
+  const keyArray = splitByDot(keyString)
+  const len = keyArray.length
+  if (len > 0) { // 如果key存在,则取对应的值,否则将原对象返回
+    keyArray.forEach((key, index) => {
+      if (typeof result[key] === 'undefined' || result[key] === null) {
+        if (index === len - 1) {
+          result[key] = null
+        } else {
+          result[key] = {}
+        }
+      }
+      result = result[key]
+    })
+  }
+  return result
+}
+
+/**
+ * 通过字符串对object多层设值,字符串为'key1.key2'的形式
+ * @param obj {object} 目标对象
+ * @param keyString {string} 要设置值的key,形为'key1.key2'的字符串
+ * @param val {*} 需要设置的值
+ */
+export function setValByKey(obj, keyString, val) {
+  let current = obj
+  const keyArray = splitByDot(keyString)
+  const len = keyArray.length
+
+  if (len > 0) {
+    keyArray.forEach((key, index) => {
+      if (len === 1) { // 如果为单层,则直接设置
+        obj[key] = val
+      } else { // 否则在最后一层设置值,以保持对象的引用
+        if (index === len - 1) {
+          current[key] = val
+        }
+        current = current[key]
+      }
+    })
+  }
+}
+
+/**
+ * 导出列表字段数据
+ * @param dataList {array} 目标数组
+ * @param field {string} 导出字段
+ */
+export function exportListData(dataList, field) {
+  let data = []
+  if (dataList.length > 0) {
+    dataList.forEach((item) => {
+      switch (typeof field) {
+        case 'string':
+          data.push(item[field] ? String(item[field]).trim() : '')
+          break
+        case 'function':
+          data = data.concat(field(dataList, item))
+          break
+      }
+    })
+    return data
+  }
 }

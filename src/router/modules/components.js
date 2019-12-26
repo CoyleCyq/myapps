@@ -8,7 +8,7 @@ const componentsRouter = {
   redirect: 'noRedirect',
   name: 'ComponentDemo',
   meta: {
-    title: 'Components',
+    title: '组件',
     icon: 'component'
   },
   children: [
@@ -40,7 +40,7 @@ const componentsRouter = {
       path: 'avatar-upload',
       component: () => import('@/views/components-demo/avatar-upload'),
       name: 'AvatarUploadDemo',
-      meta: { title: 'Upload' }
+      meta: { title: '上传' }
     },
     {
       path: 'dropzone',
@@ -52,7 +52,7 @@ const componentsRouter = {
       path: 'sticky',
       component: () => import('@/views/components-demo/sticky'),
       name: 'StickyDemo',
-      meta: { title: 'Sticky' }
+      meta: { title: '吸顶菜单' }
     },
     {
       path: 'count-to',
@@ -70,13 +70,13 @@ const componentsRouter = {
       path: 'back-to-top',
       component: () => import('@/views/components-demo/back-to-top'),
       name: 'BackToTopDemo',
-      meta: { title: 'Back To Top' }
+      meta: { title: '返回顶部' }
     },
     {
       path: 'drag-dialog',
       component: () => import('@/views/components-demo/drag-dialog'),
       name: 'DragDialogDemo',
-      meta: { title: 'Drag Dialog' }
+      meta: { title: '拖拽 Dialog' }
     },
     {
       path: 'drag-select',
@@ -94,7 +94,7 @@ const componentsRouter = {
       path: 'drag-kanban',
       component: () => import('@/views/components-demo/drag-kanban'),
       name: 'DragKanbanDemo',
-      meta: { title: 'Drag Kanban' }
+      meta: { title: '拖拽 Kanban' }
     }
   ]
 }

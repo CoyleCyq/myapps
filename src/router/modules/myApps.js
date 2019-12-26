@@ -53,13 +53,19 @@ const myAppsRouter = {
       component: () => import('@/views/myApps/designerShadow.vue'),
       name: 'designerShadow',
       meta: { title: '设计师之影' }
+    },
+    {
+      path: 'collection',
+      component: () => import('@/views/myApps/collection.vue'),
+      name: 'collection',
+      meta: { title: '馆藏' }
+    },
+    {
+      path: 'country',
+      component: () => import('@/views/myApps/country.vue'),
+      name: 'country',
+      meta: { title: '国家' }
     }
-    // {
-    //   path: 'collection',
-    //   component: () => import('@/views/myApps/collection.vue'),
-    //   name: 'collection',
-    //   meta: { title: '馆藏' }
-    // },
     // {
     //   path: 'alliance',
     //   component: () => import('@/views/myApps/alliance.vue'),
