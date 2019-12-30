@@ -198,6 +198,7 @@ table {
     color: #fff;
     padding: 5px;
     margin: 0 2px;
+
     &.attr-label {
       display: inline-block;
       width: 40px;
@@ -205,7 +206,8 @@ table {
       line-height: 28px;
       border-radius: 50%;
     }
-    &.text-label{
+
+    &.text-label {
       background: none;
       color: $text;
     }
@@ -214,35 +216,44 @@ table {
 
 /*layout css*/
 .margin-top-5 {
-  margin-top: 5px !important; 
+  margin-top: 5px !important;
 }
+
 .margin-bottom-5 {
-  margin-bottom: 5px !important; 
+  margin-bottom: 5px !important;
 }
+
 .margin-left-5 {
-  margin-left: 5px !important; 
+  margin-left: 5px !important;
 }
+
 .margin-right-5 {
-  margin-right: 5px !important; 
+  margin-right: 5px !important;
 }
+
 .margin-top-10 {
-  margin-top: 10px !important; 
+  margin-top: 10px !important;
 }
+
 .margin-bottom-10 {
-  margin-bottom: 10px !important; 
+  margin-bottom: 10px !important;
 }
+
 .margin-left-10 {
-  margin-left: 10px !important; 
+  margin-left: 10px !important;
 }
+
 .margin-right-10 {
-  margin-right: 10px !important; 
+  margin-right: 10px !important;
 }
 
 /* table start*/
 .custom--table {
   width: 100%;
   border-collapse: collapse;
-  td,th {
+
+  td,
+  th {
     border: $--table-border;
     padding: 10px
   }
@@ -254,3 +265,81 @@ table {
 .font-danger {
   color: red;
 }
+
+/*编辑页面公共样式 start*/
+.edit-page-container {
+  padding-top: 20px;
+  background: #f2f4f8;
+
+  .fixed-header {
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    padding: 0 40px;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #D6D7DA;
+    margin-bottom: 10px;
+    z-index: 1000;
+  }
+
+  .edit-content {
+    width: 1340px;
+    margin: 0 auto;
+
+    .item-info {
+      margin-bottom: 20px;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
+
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+
+      .item-info-title {
+        height: 39px;
+        padding: 0 15px;
+        border-bottom: 1px solid #D6D7DA;
+        display: flex;
+        align-items: center;
+        font-size: 0;
+
+        span {
+          font-weight: bold;
+          font-size: 16px;
+          color: #333;
+          vertical-align: middle;
+          display: inline-block;
+          line-height: 39px;
+
+          &:before {
+            content: "";
+            display: inline-block;
+            height: 18px;
+            width: 6px;
+            background-color: #8BC34A;
+            margin-right: 15px;
+            vertical-align: inherit;
+          }
+        }
+      }
+
+      .item-info-content {
+        padding: 20px;
+
+        .el-form-item {
+          margin-bottom: 10px !important;
+
+          &:last-of-type {
+            margin-bottom: 0 !important;
+          }
+        }
+      }
+    }
+  }
+}
+/*编辑页面公共样式 start*/

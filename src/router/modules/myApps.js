@@ -65,6 +65,12 @@ const myAppsRouter = {
       component: () => import('@/views/myApps/country.vue'),
       name: 'country',
       meta: { title: '国家' }
+    },
+    {
+      path: 'editJoomListing',
+      component: () => import('@/views/myApps/editJoomListing/index.vue'),
+      name: 'editJoomListing',
+      meta: { title: '编辑JoomListing' }
     }
     // {
     //   path: 'alliance',

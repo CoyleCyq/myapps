@@ -468,3 +468,12 @@ export function exportListData(dataList, field) {
     return data
   }
 }
+
+/**
+ * 清除首尾空格
+ * @param string {string} 目标字符串
+ * @return string 返回一个字符串
+ */
+export function trim(string) {
+  return (string || '').replace(/^[\s\uFEFF]+|[\s\uFEFF]+$/g, '')
+}
