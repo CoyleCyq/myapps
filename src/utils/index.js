@@ -477,3 +477,17 @@ export function exportListData(dataList, field) {
 export function trim(string) {
   return (string || '').replace(/^[\s\uFEFF]+|[\s\uFEFF]+$/g, '')
 }
+
+export function byteJudge(value) {
+  if (!value) return 0
+  var sum = 0
+  var rex = /[^\x00-\xff]/
+  for (var i = 0; i < value.length; i++) {
+    if (rex.test(value[i])) {
+      sum += 2
+    } else {
+      sum += 1
+    }
+  }
+  return sum
+}

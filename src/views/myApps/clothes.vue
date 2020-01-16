@@ -672,6 +672,7 @@ export default {
     }
     console.log('isadmin', this.isAdmin)
     console.log('isMobile', this.isMobile)
+    // this.testfetch()
   },
   methods: {
     getLevelHtml,
@@ -687,6 +688,12 @@ export default {
           this.listLoading = false
         }, 1 * 1000)
       })
+    },
+    async testfetch() {
+      const res = await fetch('http://193.112.140.29:7001/api/suit/getAllSuit', {
+        method: 'GET'
+      })
+      console.log(res)
     },
     resetFilter() {
       return debounce(() => {

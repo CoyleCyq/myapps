@@ -2,6 +2,7 @@ import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
+import { byteJudge } from '@/utils'
 
 // create an axios instance
 const service = axios.create({
@@ -14,7 +15,7 @@ const service = axios.create({
 service.interceptors.request.use(
   config => {
     // do something before request is sent
-
+    // console.log('conf', config)
     if (store.getters.token) {
       // let each request carry token
       // ['X-Token'] is a custom headers key
@@ -42,8 +43,34 @@ service.interceptors.response.use(
    * Here is just an example
    * You can also judge the status by HTTP Status Code
    */
-  response => {
+  async response => {
+    // console.log('res', response)
     const res = response.data
+
+    const log = {}
+    log.url = response.config.url
+    log.type = response.config.method
+    log.spendTime = ''
+    if (response.config.method === 'get') {
+      log.request = JSON.stringify(response.config.params)
+    }
+    log.response = JSON.stringify(res)
+
+    const resSize = byteJudge(log.response)
+    const reqSize = byteJudge(log.request)
+    // console.log('ttt', byteJudge(log.response))
+    if (resSize < 10000 && reqSize < 10000) {
+      const res = fetch('http://localhost:7001/api/operationLog/addLog', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(log)
+      })
+      console.log(res)
+    }
+    console.log('log', log)
+
     // if the custom code is not 20000, it is judged as an error.
     if (res.code !== 0) {
       Message({
